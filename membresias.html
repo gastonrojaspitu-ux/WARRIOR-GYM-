@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Membresías | Warrior Gym</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+
+        <div class="container">
+
+            <a class="navbar-brand fw-bold" href="index.html">
+                WARRIOR GYM
+            </a>
+
+            <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
+
+            <div class="collapse navbar-collapse" id="menu">
+
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Inicio</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="nosotros.html">Nosotros</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="membresias.html">Membresías</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="clases.html">Clases</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="tienda.html">Tienda</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacto.html">Contacto</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link btn-login" href="pages/login.html">Login</a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    <!-- HERO -->
+
+    <section class="membership-hero">
+
+        <div class="membership-overlay"></div>
+
+        <div class="container">
+
+            <div class="membership-content">
+
+                <h1>MEMBRESÍAS WARRIOR GYM</h1>
+
+                <p>
+                    Elegí el plan ideal para alcanzar tus objetivos
+                    y comenzá hoy mismo tu transformación.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- PLANES -->
+
+    <section class="planes-section">
+
+        <div class="container">
+
+            <div class="section-title">
+
+                <h2>Nuestros Planes</h2>
+
+                <p>
+                    Diseñados para cada nivel de entrenamiento.
+                </p>
+
+            </div>
+
+            <div class="row g-4 mt-4">
+
+                <!-- BASICO -->
+
+                <div class="col-lg-4">
+
+                    <div class="plan-card">
+
+                        <h3>Básico</h3>
+
+                        <div class="price">
+                            $18.000
+                        </div>
+
+                        <ul>
+
+                            <li>✔ Sala de musculación</li>
+
+                            <li>✔ Horario libre</li>
+
+                            <li>✔ Vestuarios</li>
+
+                            <li>✔ Acceso general</li>
+
+                        </ul>
+
+                        <button
+    class="btn btn-danger w-100"
+    data-bs-toggle="modal"
+    data-bs-target="#planModal">
+
+    Elegir Plan
+
+</button>
+
+                    </div>
+
+                </div>
+
+                <!-- PREMIUM -->
+
+                <div class="col-lg-4">
+
+                    <div class="plan-card featured">
+
+                        <span class="badge-plan">
+                            MÁS POPULAR
+                        </span>
+
+                        <h3>Premium</h3>
+
+                        <div class="price">
+                            $28.000
+                        </div>
+
+                        <ul>
+
+                            <li>✔ Todo lo anterior</li>
+
+                            <li>✔ Clases grupales</li>
+
+                            <li>✔ Rutinas personalizadas</li>
+
+                            <li>✔ Seguimiento profesional</li>
+
+                        </ul>
+
+                        <button
+    class="btn btn-danger w-100"
+    data-bs-toggle="modal"
+    data-bs-target="#planModal">
+
+    Elegir Plan
+
+</button>
+
+                    </div>
+
+                </div>
+
+                <!-- ELITE -->
+
+                <div class="col-lg-4">
+
+                    <div class="plan-card">
+
+                        <h3>Elite</h3>
+
+                        <div class="price">
+                            $45.990
+                        </div>
+
+                        <ul>
+
+                            <li>✔ Todo lo anterior</li>
+
+                            <li>✔ Evaluación física</li>
+
+                            <li>✔ Reservas prioritarias</li>
+
+                            <li>✔ Beneficios exclusivos</li>
+
+                        </ul>
+
+                        <button
+    class="btn btn-danger w-100"
+    data-bs-toggle="modal"
+    data-bs-target="#planModal">
+
+    Elegir Plan
+
+</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+    <!-- ========================= -->
+<!-- COMPARATIVA -->
+<!-- ========================= -->
+
+<section class="comparativa-section">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <h2>Compará Nuestros Planes</h2>
+
+            <p>
+                Encontrá la membresía que mejor se adapte a tus objetivos.
+            </p>
+
+        </div>
+
+        <div class="comparativa-table mt-5">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Beneficio</th>
+
+                        <th>Básico</th>
+
+                        <th>Premium</th>
+
+                        <th>Elite</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Musculación</td>
+
+                        <td>✔</td>
+
+                        <td>✔</td>
+
+                        <td>✔</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Área Cardio</td>
+
+                        <td>✔</td>
+
+                        <td>✔</td>
+
+                        <td>✔</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Clases Grupales</td>
+
+                        <td>❌</td>
+
+                        <td>✔</td>
+
+                        <td>✔</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Rutina Personalizada</td>
+
+                        <td>❌</td>
+
+                        <td>✔</td>
+
+                        <td>✔</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Evaluación Física</td>
+
+                        <td>❌</td>
+
+                        <td>❌</td>
+
+                        <td>✔</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Reservas Prioritarias</td>
+
+                        <td>❌</td>
+
+                        <td>❌</td>
+
+                        <td>✔</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+    <!-- BENEFICIOS -->
+
+    <section class="benefits-section">
+
+        <div class="container">
+
+            <div class="section-title">
+
+                <h2>¿Por qué elegir Warrior Gym?</h2>
+
+            </div>
+
+            <div class="row g-4 mt-4">
+
+                <div class="col-md-3">
+
+                    <div class="benefit-card">
+
+                        <i class="bi bi-trophy-fill"></i>
+
+                        <h4>Resultados</h4>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="benefit-card">
+
+                        <i class="bi bi-person-check-fill"></i>
+
+                        <h4>Profesionales</h4>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="benefit-card">
+
+                        <i class="bi bi-lightning-fill"></i>
+
+                        <h4>Tecnología</h4>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="benefit-card">
+
+                        <i class="bi bi-heart-pulse-fill"></i>
+
+                        <h4>Bienestar</h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+    <!-- ========================= -->
+<!-- FAQ -->
+<!-- ========================= -->
+
+<section class="faq-section">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <h2>Preguntas Frecuentes</h2>
+
+            <p>
+                Respondemos las dudas más comunes de nuestros socios.
+            </p>
+
+        </div>
+
+        <div class="accordion mt-5" id="faqAccordion">
+
+            <div class="accordion-item">
+
+                <h2 class="accordion-header">
+
+                    <button class="accordion-button"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq1">
+
+                        ¿Puedo cambiar de plan?
+
+                    </button>
+
+                </h2>
+
+                <div id="faq1"
+                    class="accordion-collapse collapse show"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+
+                        Sí. Podés solicitar el cambio de plan en cualquier momento.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="accordion-item">
+
+                <h2 class="accordion-header">
+
+                    <button class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq2">
+
+                        ¿Cómo realizo el pago?
+
+                    </button>
+
+                </h2>
+
+                <div id="faq2"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+
+                        Aceptamos efectivo, transferencia, débito y crédito.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="accordion-item">
+
+                <h2 class="accordion-header">
+
+                    <button class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq3">
+
+                        ¿Puedo cancelar mi membresía?
+
+                    </button>
+
+                </h2>
+
+                <div id="faq3"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+
+                        Sí. Podés solicitar la baja según las condiciones del plan contratado.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- TESTIMONIOS -->
+<!-- ========================= -->
+
+<section class="testimonios-section">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <h2>Lo que dicen nuestros socios</h2>
+
+            <p>
+                Historias reales de personas que entrenan en Warrior Gym.
+            </p>
+
+        </div>
+
+        <div class="row g-4 mt-4">
+
+            <div class="col-lg-4">
+
+                <div class="testimonio-card">
+
+                    <i class="bi bi-quote"></i>
+
+                    <p>
+                        Excelente ambiente y entrenadores muy atentos.
+                        Logré resultados en pocos meses.
+                    </p>
+
+                    <h5>Lucas Fernández</h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="testimonio-card">
+
+                    <i class="bi bi-quote"></i>
+
+                    <p>
+                        Equipamiento moderno y clases muy dinámicas.
+                        Totalmente recomendado.
+                    </p>
+
+                    <h5>María González</h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="testimonio-card">
+
+                    <i class="bi bi-quote"></i>
+
+                    <p>
+                        Me ayudaron a mejorar mi estado físico y adquirir hábitos saludables.
+                    </p>
+
+                    <h5>Javier Romero</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section><!-- ========================= -->
+<!-- CONTACTO RAPIDO -->
+<!-- ========================= -->
+
+<section class="quick-contact">
+
+    <div class="container">
+
+        <div class="row text-center">
+
+            <div class="col-md-4">
+
+                <i class="bi bi-whatsapp"></i>
+
+                <h4>WhatsApp</h4>
+
+                <p>+54 9 3774 551234</p>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <i class="bi bi-envelope-fill"></i>
+
+                <h4>Email</h4>
+
+                <p>info@warriorgym.com</p>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <i class="bi bi-clock-fill"></i>
+
+                <h4>Horarios</h4>
+
+                <p>Lun-Vie 06:00 - 22:00 / Sáb 08:00 - 18:00</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+    <!-- CTA -->
+
+    <section class="cta-section">
+
+        <div class="container text-center">
+
+            <h2>Comenzá hoy tu transformación</h2>
+
+            <p>
+                Sumate a Warrior Gym y llevá tu entrenamiento al siguiente nivel.
+            </p>
+
+            <a href="contacto.html" class="btn btn-danger btn-lg">
+                Asociarme
+            </a>
+
+        </div>
+
+    </section><!-- ========================= -->
+<!-- MODAL MEMBRESIA -->
+<!-- ========================= -->
+
+<div class="modal fade"
+    id="planModal"
+    tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content membership-modal">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    Solicitar Membresía
+
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal">
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Nombre
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Apellido
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Teléfono
+                        </label>
+
+                        <input
+                            type="tel"
+                            class="form-control">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Plan
+                        </label>
+
+                        <select class="form-select">
+
+                            <option>Básico</option>
+
+                            <option>Premium</option>
+
+                            <option>Elite</option>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger w-100">
+
+                        Enviar Solicitud
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        <div class="container text-center">
+
+            <p>
+                © 2026 Warrior Gym - Todos los derechos reservados.
+            </p>
+
+        </div>
+
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

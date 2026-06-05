@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- META -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Warrior Gym - El mejor gimnasio de Curuzú Cuatiá. Planes personalizados, entrenadores certificados y tecnología avanzada." />
+  <meta name="keywords" content="gimnasio, fitness, entrenamiento, planes, membresias" />
+  <meta name="author" content="Warrior Gym" />
+  <meta property="og:title" content="Warrior Gym - Tu Transformación Comienza Hoy" />
+  <meta property="og:description" content="Entrenamientos personalizados con entrenadores certificados y equipamiento moderno." />
+  <meta property="og:type" content="website" />
+
+  <!-- TITULO -->
+  <title>Warrior Gym - El Mejor Gimnasio de Curuzú Cuatiá</title>
+
+  <!-- BOOTSTRAP -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- ICONOS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+  />
+
+  <!-- AOS - ANIMATE ON SCROLL -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ========================= -->
+  <!-- NAVBAR -->
+  <!-- ========================= -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">WARRIOR GYM</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#menu"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="menu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="nosotros.html">Nosotros</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="membresias.html">Planes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="clases.html">Clases</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="tienda.html">Tienda</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contacto.html">Contacto</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn-login" href="pages/login.html">Login</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================= -->
+  <!-- HERO CAROUSEL -->
+  <!-- ========================= -->
+  <section class="hero-carousel">
+    <div
+      id="heroSlider"
+      class="carousel slide carousel-fade"
+      data-bs-ride="carousel"
+      data-bs-pause="false"
+      data-bs-interval="3000"
+      data-bs-touch="true"
+    >
+      <!-- INDICADORES -->
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#heroSlider"
+          data-bs-slide-to="0"
+          class="active"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#heroSlider"
+          data-bs-slide-to="1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#heroSlider"
+          data-bs-slide-to="2"
+        ></button>
+      </div>
+
+      <div class="carousel-inner">
+        <!-- SLIDE 1 -->
+        <div class="carousel-item active">
+          <div class="hero-slide slide-1">
+            <div class="overlay"></div>
+            <div class="container">
+              <div class="hero-content">
+                <h1>EL MEJOR GYM DE CURUZÚ CUATIÁ</h1>
+                <p>
+                  Entrená con planes locales, entrenadores certificados y un
+                  espacio pensado para tu progreso real.
+                </p>
+                <div class="hero-buttons">
+                  <a href="membresias.html" class="btn btn-danger btn-lg">
+                    Ver Planes
+                  </a>
+                  <a
+                    href="tienda.html"
+                    class="btn btn-outline-light btn-lg"
+                  >
+                    Ver Tienda
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="carousel-item">
+          <div class="hero-slide slide-2">
+            <div class="overlay"></div>
+            <div class="container">
+              <div class="hero-content">
+                <h1>ENTRENÁ CON PROFESIONALES Y TECNOLOGÍA AVANZADA</h1>
+                <p>
+                  Equipamiento moderno, entrenadores certificados y clases
+                  diseñadas para maximizar tu rendimiento.
+                </p>
+                <div class="hero-buttons">
+                  <a href="clases.html" class="btn btn-danger btn-lg">
+                    Nuestras Clases
+                  </a>
+                  <a
+                    href="nosotros.html"
+                    class="btn btn-outline-light btn-lg"
+                  >
+                    Conocer Más
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 3 -->
+        <div class="carousel-item">
+          <div class="hero-slide slide-3">
+            <div class="overlay"></div>
+            <div class="container">
+              <div class="hero-content">
+                <h1>OBJETIVOS PERSONALIZADOS PARA CADA CLIENTE</h1>
+                <p>
+                  Planes adaptados a cada nivel, seguimiento inteligente y
+                  herramientas diseñadas para tu progreso.
+                </p>
+                <div class="hero-buttons">
+                  <a href="membresias.html" class="btn btn-danger btn-lg">
+                    Ver Membresías
+                  </a>
+                  <a
+                    href="contacto.html"
+                    class="btn btn-outline-light btn-lg"
+                  >
+                    Contactarnos
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- VALOR RAPIDO -->
+  <!-- ========================= -->
+  <section class="quick-value py-4 bg-dark text-white" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+      <div class="row g-3 text-center">
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+          <div class="p-4 rounded-4 border border-white border-opacity-10 h-100 quick-value-card">
+            <i class="bi bi-lightning-charge-fill text-warning fs-1"></i>
+            <h5 class="mt-3">Resultados Rápidos</h5>
+            <p class="mb-0">Programas claros para ver mejoras semana a semana.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+          <div class="p-4 rounded-4 border border-white border-opacity-10 h-100 quick-value-card">
+            <i class="bi bi-people-fill text-warning fs-1"></i>
+            <h5 class="mt-3">Atención Personalizada</h5>
+            <p class="mb-0">Entrenadores a tu lado desde el primer día.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
+          <div class="p-4 rounded-4 border border-white border-opacity-10 h-100 quick-value-card">
+            <i class="bi bi-shop-window text-warning fs-1"></i>
+            <h5 class="mt-3">Tienda Gym</h5>
+            <p class="mb-0">Comprá suplementos y accesorios sin salir del sitio.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ========================= -->
+<!-- ESTADISTICAS -->
+<!-- ========================= -->
+<section class="stats-section" data-aos="fade-up">
+  <div class="container">
+    <div class="row text-center">
+
+      <div class="col-md-3" data-aos="count-up" data-aos-delay="100">
+        <div class="stat-box">
+          <h2>450+</h2>
+          <p>Socios Activos</p>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="count-up" data-aos-delay="200">
+        <div class="stat-box">
+          <h2>35+</h2>
+          <p>Máquinas Profesionales</p>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="count-up" data-aos-delay="300">
+        <div class="stat-box">
+          <h2>8</h2>
+          <p>Entrenadores Certificados</p>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="count-up" data-aos-delay="400">
+        <div class="stat-box">
+          <h2>8</h2>
+          <p>Años de Trayectoria</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================= -->
+<!-- BENEFICIOS -->
+<!-- ========================= -->
+<section class="benefits-section" data-aos="fade-up">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>¿Por qué elegir Warrior Gym?</h2>
+      <p>Todo lo que necesitás para alcanzar tus objetivos.</p>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="benefit-card">
+          <i class="bi bi-person-check"></i>
+          <h4>Entrenamiento Personalizado</h4>
+          <p>Rutinas adaptadas a cada objetivo.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="benefit-card">
+          <i class="bi bi-lightning-charge"></i>
+          <h4>Equipamiento Moderno</h4>
+          <p>Máquinas de última generación.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="benefit-card">
+          <i class="bi bi-award"></i>
+          <h4>Profesionales Certificados</h4>
+          <p>Seguimiento constante y seguro.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="benefit-card">
+          <i class="bi bi-clock"></i>
+          <h4>Horarios Flexibles</h4>
+          <p>Entrená cuando más te convenga.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ========================= -->
+<!-- OBJETIVOS -->
+<!-- ========================= -->
+<section class="goals-section" data-aos="fade-up">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>¿Cuál es tu objetivo?</h2>
+      <p>Elegí el camino que mejor se adapte a vos.</p>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-md-3" data-aos="flip-left" data-aos-delay="100">
+        <div class="goal-card">
+          <i class="bi bi-fire"></i>
+          <h4>Perder Peso</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="flip-left" data-aos-delay="200">
+        <div class="goal-card">
+          <i class="bi bi-trophy"></i>
+          <h4>Ganar Masa Muscular</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="flip-left" data-aos-delay="300">
+        <div class="goal-card">
+          <i class="bi bi-lightning"></i>
+          <h4>Mejorar Resistencia</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3" data-aos="flip-left" data-aos-delay="400">
+        <div class="goal-card">
+          <i class="bi bi-star"></i>
+          <h4>Rendimiento Deportivo</h4>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+<!-- ========================= -->
+<!-- MEMBRESIAS -->
+<!-- ========================= -->
+
+<section class="membership-section" data-aos="fade-up">
+
+    <div class="container">
+
+        <div class="section-title">
+            <h2>Elegí tu plan ideal</h2>
+            <p>Planes diseñados para cada objetivo y nivel de entrenamiento.</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="100">
+
+                <div class="membership-card">
+
+                    <h3>Básico</h3>
+
+                    <div class="price">$18.000</div>
+
+                    <ul>
+                        <li>Acceso a musculación</li>
+                        <li>Vestuarios</li>
+                        <li>Horario estándar</li>
+                    </ul>
+
+                    <button
+    class="btn btn-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#modalBasico">
+    Elegir Plan
+</button>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="200">
+
+                <div class="membership-card featured">
+
+                    <span class="badge-plan">
+                        Más Elegido
+                    </span>
+
+                    <h3>Premium</h3>
+
+                    <div class="price">$28.000</div>
+
+                    <ul>
+                        <li>Todo lo del Básico</li>
+                        <li>Clases grupales</li>
+                        <li>Seguimiento mensual</li>
+                    </ul>
+
+                    <button
+    class="btn btn-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#modalPremium">
+    Elegir Plan
+</button>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="300">
+
+                <div class="membership-card">
+
+                    <h3>Elite</h3>
+
+                    <div class="price">$45.990</div>
+
+                    <ul>
+                        <li>Acceso completo</li>
+                        <li>Rutinas personalizadas</li>
+                        <li>Reservas prioritarias</li>
+                        <li>Seguimiento permanente</li>
+                    </ul>
+
+                   <button
+    class="btn btn-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#modalElite">
+    Elegir Plan
+</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- SISTEMA INTELIGENTE -->
+<!-- ========================= -->
+
+<section class="system-section" data-aos="fade-up">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <div class="system-image">
+                    <img src="img/dashboard.png" alt="Sistema Warrior Gym" class="img-fluid">
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="system-content">
+
+                    <span class="system-badge">
+                        TECNOLOGÍA WARRIOR
+                    </span>
+
+                    <h2>
+                        Gestioná toda tu experiencia desde un solo lugar
+                    </h2>
+
+                    <p>
+                        Warrior Gym integra entrenamiento y tecnología para que
+                        puedas administrar tus actividades de manera rápida,
+                        segura y eficiente.
+                    </p>
+
+                    <div class="system-feature">
+
+                        <i class="bi bi-calendar-check"></i>
+
+                        <div>
+                            <h5>Reservas Online</h5>
+                            <p>Reservá aparatos y espacios fácilmente.</p>
+                        </div>
+
+                    </div>
+
+                    <div class="system-feature">
+
+                        <i class="bi bi-clipboard-data"></i>
+
+                        <div>
+                            <h5>Rutinas Personalizadas</h5>
+                            <p>Seguimiento completo de tus entrenamientos.</p>
+                        </div>
+
+                    </div>
+
+                    <div class="system-feature">
+
+                        <i class="bi bi-credit-card"></i>
+
+                        <div>
+                            <h5>Gestión de Membresías</h5>
+                            <p>Control de planes, pagos y vencimientos.</p>
+                        </div>
+
+                    </div>
+
+                    <div class="system-feature">
+
+                        <i class="bi bi-shield-check"></i>
+
+                        <div>
+                            <h5>Acceso Seguro</h5>
+                            <p>Información protegida mediante usuarios registrados.</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- TESTIMONIOS -->
+<!-- ========================= -->
+
+<section class="testimonials-section" data-aos="fade-up">
+
+    <div class="container">
+
+        <div class="section-title" data-aos="fade-down">
+            <h2>Lo que dicen nuestros socios</h2>
+            <p>Experiencias reales de quienes entrenan en Warrior Gym.</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-4">
+
+                <div class="testimonial-card">
+
+                    <div class="stars">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+
+                    <p>
+                        "Excelente ambiente, entrenadores atentos y equipos modernos. Logré mis objetivos mucho más rápido de lo que esperaba."
+                    </p>
+
+                    <h5>Martín Gómez</h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+
+                <div class="testimonial-card">
+
+                    <div class="stars">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+
+                    <p>
+                        "Las rutinas personalizadas hicieron una gran diferencia. Recomiendo Warrior Gym a cualquiera que quiera progresar."
+                    </p>
+
+                    <h5>Lucía Fernández</h5>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+
+                <div class="testimonial-card">
+
+                    <div class="stars">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+
+                    <p>
+                        "El sistema de reservas y seguimiento es excelente. Todo está organizado y es muy fácil de usar."
+                    </p>
+
+                    <h5>Juan Pérez</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- EVENTOS -->
+<!-- ========================= -->
+
+<section class="events-section" data-aos="fade-up">
+
+    <div class="container">
+
+        <div class="section-title" data-aos="fade-down">
+            <h2>Próximos Eventos</h2>
+            <p>No te pierdas las actividades exclusivas de Warrior Gym.</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+
+                <div class="event-card">
+
+                    <span class="event-date">
+                        15 JUN
+                    </span>
+
+                    <h4>Desafío Warrior 30 Días</h4>
+
+                    <p>
+                        Un reto para mejorar tu rendimiento físico y superar tus límites.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+
+                <div class="event-card">
+
+                    <span class="event-date">
+                        22 JUN
+                    </span>
+
+                    <h4>Competencia de Fuerza</h4>
+
+                    <p>
+                        Demostrá tu potencia y competí con otros socios del gimnasio.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+
+                <div class="event-card">
+
+                    <span class="event-date">
+                        28 JUN
+                    </span>
+
+                    <h4>Charla de Nutrición</h4>
+
+                    <p>
+                        Consejos prácticos para potenciar tus resultados deportivos.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- FAQ -->
+<!-- ========================= -->
+
+<section class="faq-section" data-aos="fade-up">
+
+    <div class="container">
+
+        <div class="section-title" data-aos="fade-down">
+            <h2>Preguntas Frecuentes</h2>
+            <p>Respondemos las dudas más comunes de nuestros socios.</p>
+        </div>
+
+        <div class="accordion" id="faqAccordion">
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq1">
+                        ¿Necesito inscripción para comenzar?
+                    </button>
+                </h2>
+
+                <div id="faq1"
+                    class="accordion-collapse collapse show"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+                        Sí. La inscripción permite activar tu cuenta y acceder a todos los servicios del gimnasio.
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq2">
+
+                        ¿Qué medios de pago aceptan?
+                    </button>
+                </h2>
+
+                <div id="faq2"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+                        Aceptamos efectivo, tarjetas, transferencias y Mercado Pago.
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq3">
+
+                        ¿Las rutinas son personalizadas?
+                    </button>
+                </h2>
+
+                <div id="faq3"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+                        Sí. Nuestros entrenadores elaboran rutinas adaptadas a cada objetivo y nivel de experiencia.
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq4">
+
+                        ¿Puedo congelar mi membresía?
+                    </button>
+                </h2>
+
+                <div id="faq4"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#faqAccordion">
+
+                    <div class="accordion-body">
+                        Sí. Se puede solicitar la suspensión temporal de la membresía según las políticas del gimnasio.
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- CTA FINAL -->
+<!-- ========================= -->
+
+<section class="cta-section">
+
+    <div class="cta-overlay"></div>
+
+    <div class="container">
+
+        <div class="cta-content">
+
+            <h2>Tu transformación comienza hoy</h2>
+
+            <p>
+                Sumate a Warrior Gym y alcanzá tus objetivos con el respaldo
+                de entrenadores profesionales, tecnología moderna y una
+                comunidad que te impulsa a mejorar cada día.
+            </p>
+
+            <div class="cta-buttons">
+
+                <a href="membresias.html" class="btn btn-danger btn-lg">
+                    Ver Membresías
+                </a>
+
+                <a href="contacto.html" class="btn btn-outline-light btn-lg">
+                    Contactanos
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- FOOTER -->
+<!-- ========================= -->
+
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="row">
+
+            <!-- COLUMNA 1 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+
+                <h3>WARRIOR GYM</h3>
+
+                <p>
+                    Más que un gimnasio, una comunidad enfocada en ayudarte
+                    a alcanzar tus objetivos mediante entrenamiento,
+                    disciplina y tecnología.
+                </p>
+
+            </div>
+
+            <!-- COLUMNA 2 -->
+            <div class="col-lg-2 col-md-6 mb-4">
+
+                <h4>Navegación</h4>
+
+                <ul class="footer-links">
+
+                    <li><a href="#">Inicio</a></li>
+
+                    <li><a href="nosotros.html">Nosotros</a></li>
+
+                    <li><a href="membresias.html">Membresías</a></li>
+
+                    <li><a href="clases.html">Clases</a></li>
+
+                    <li><a href="contacto.html">Contacto</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- COLUMNA 3 -->
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <h4>Horarios</h4>
+
+                <p>Lunes a Viernes</p>
+                <p>Lun-Vie 06:00 - 22:00 / Sáb 08:00 - 18:00</p>
+
+                <p>Sábados</p>
+                <p>08:00 - 20:00 hs</p>
+
+            </div>
+
+            <!-- COLUMNA 4 -->
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <h4>Seguinos</h4>
+
+                <div class="social-icons">
+
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+
+                    <a href="#"><i class="bi bi-tiktok"></i></a>
+
+                    <a href="#"><i class="bi bi-whatsapp"></i></a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr>
+
+        <div class="footer-bottom">
+
+            <p>
+                © 2026 Warrior Gym. Todos los derechos reservados.
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<!-- ========================= -->
+<!-- BOTON WHATSAPP FLOTANTE -->
+<!-- ========================= -->
+<a href="https://wa.me/5437638485" target="_blank" class="whatsapp-float" title="Contactanos por WhatsApp">
+  <i class="bi bi-whatsapp"></i>
+</a>
+
+<!-- ========================= -->
+<!-- MODAL BASICO -->
+<!-- ========================= -->
+
+<div class="modal fade" id="modalBasico" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Plan Básico</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <h3 class="text-danger">$18.000</h3>
+
+                <ul>
+                    <li>Acceso a musculación</li>
+                    <li>Vestuarios</li>
+                    <li>Horario estándar</li>
+                </ul>
+
+                <p>
+                    Ideal para quienes comienzan su entrenamiento.
+                </p>
+
+            </div>
+
+            <div class="modal-footer border-secondary">
+
+                <a href="contacto.html" class="btn btn-danger">
+                    Solicitar Información
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ========================= -->
+<!-- MODAL PREMIUM -->
+<!-- ========================= -->
+
+<div class="modal fade" id="modalPremium" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Plan Premium</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <h3 class="text-danger">$28.000</h3>
+
+                <ul>
+                    <li>Acceso completo</li>
+                    <li>Clases grupales</li>
+                    <li>Seguimiento mensual</li>
+                </ul>
+
+                <p>
+                    El plan más elegido por nuestros socios.
+                </p>
+
+            </div>
+
+            <div class="modal-footer border-secondary">
+
+                <a href="contacto.html" class="btn btn-danger">
+                    Solicitar Información
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ========================= -->
+<!-- MODAL ELITE -->
+<!-- ========================= -->
+
+<div class="modal fade" id="modalElite" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Plan Elite</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <h3 class="text-danger">$45.990</h3>
+
+                <ul>
+                    <li>Acceso total</li>
+                    <li>Rutinas personalizadas</li>
+                    <li>Reservas prioritarias</li>
+                    <li>Seguimiento permanente</li>
+                </ul>
+
+                <p>
+                    La experiencia Warrior Gym más completa.
+                </p>
+
+            </div>
+
+            <div class="modal-footer border-secondary">
+
+                <a href="contacto.html" class="btn btn-danger">
+                    Solicitar Información
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+  <!-- BOOTSTRAP -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- AOS - ANIMATE ON SCROLL -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- APP JS -->
+  <script src="js/app.js"></script>
+
+  <!-- AUTOPLAY Y CAROUSEL CONFIG -->
+  <script>
+    // Esperar a que Bootstrap cargue completamente
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const heroCarouselEl = document.getElementById('heroSlider');
+        
+        if (heroCarouselEl) {
+          // Destruir cualquier instancia anterior
+          const existingCarousel = bootstrap.Carousel.getInstance(heroCarouselEl);
+          if (existingCarousel) {
+            existingCarousel.dispose();
+          }
+          
+          // Crear nueva instancia del carousel
+          const carousel = new bootstrap.Carousel(heroCarouselEl, {
+            interval: 3000,      // Cambiar de slide cada 3 segundos
+            ride: true,           // Auto-play al cargar
+            pause: false,         // NO pausar al hacer hover
+            wrap: true,           // Volver al inicio después del último
+            keyboard: true        // Controlar con teclado
+          });
+          
+          console.log('✅ Carousel iniciado correctamente');
+        }
+      }, 100);
+    });
+
+    // Forzar autoplay si se pausa
+    window.addEventListener('load', function() {
+      const heroCarouselEl = document.getElementById('heroSlider');
+      if (heroCarouselEl) {
+        const carousel = bootstrap.Carousel.getInstance(heroCarouselEl);
+        if (carousel) {
+          carousel.cycle();
+          console.log('✅ Carousel en autoplay');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+
+</body>
+</html>
