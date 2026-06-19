@@ -1,142 +1,125 @@
 <?php
 session_start();
-include("../php/conexion.php");
+include(__DIR__ . "/../php/conexion.php");
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
-    exit();
+$id = $_GET['id'];
+
+/* VENTA */
+$sql = "SELECT 
+            v.id_venta,
+            v.fecha,
+            COALESCE(u.nombre,'Sin usuario') AS nombre,
+            d.cantidad,
+            d.precio_unitario,
+            p.nombre AS producto
+        FROM ventas v
+        JOIN usuarios u ON v.id_usuario = u.id_usuario
+        JOIN detalle_ventas d ON v.id_venta = d.id_venta
+        JOIN productos p ON d.id_producto = p.id_producto
+        WHERE v.id_venta = $id";
+
+$result = mysqli_query($conexion, $sql);
+
+if (!$result) {
+    die("ERROR SQL: " . mysqli_error($conexion));
 }
 
-$id_venta = $_GET['id'];
-
-/* CABECERA */
-$sqlVenta = "SELECT v.*, c.nombre, c.apellido
-             FROM ventas v
-             INNER JOIN clientes c ON v.id_cliente = c.id_cliente
-             WHERE v.id_venta = '$id_venta'";
-
-$resVenta = mysqli_query($conexion, $sqlVenta);
-$venta = mysqli_fetch_assoc($resVenta);
-
-/* DETALLE */
-$sqlDetalle = "SELECT d.*, p.nombre
-               FROM detalle_ventas d
-               INNER JOIN productos p ON d.id_producto = p.id_producto
-               WHERE d.id_venta = '$id_venta'";
-
-$resDetalle = mysqli_query($conexion, $sqlDetalle);
+$total = 0;
+$rowInfo = mysqli_fetch_assoc($result);
+mysqli_data_seek($result, 0);
 ?>
 
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Factura</title>
-
 <style>
 body{
     font-family: Arial;
-    background:#111;
-    color:white;
-}
-
-.factura{
-    width:600px;
-    margin:30px auto;
-    background:#222;
-    padding:20px;
-    border-radius:10px;
+    background: #111;
+    color: white;
+    margin: 0;
+    padding: 20px;
 }
 
 h2{
-    text-align:center;
-    color:#d40000;
+    text-align: center;
+    color: #d40000;
 }
 
 table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:15px;
-}
-
-th, td{
-    border:1px solid #444;
-    padding:10px;
-    text-align:center;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #1c1c1c;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th{
-    background:#d40000;
+    background: #d40000;
+    padding: 12px;
+    text-transform: uppercase;
 }
 
-.boton{
-    display:inline-block;
-    background:#444;
-    color:white;
-    padding:10px 15px;
-    text-decoration:none;
-    border-radius:5px;
-    margin-bottom:10px;
+td{
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    text-align: center;
 }
 
-.total{
-    text-align:right;
-    margin-top:10px;
-    font-size:18px;
+tr:hover{
+    background: #2a2a2a;
+}
+
+a{
+    color: #00ff99;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover{
+    color: #00ffaa;
 }
 </style>
 </head>
 
 <body>
 
-<div class="factura">
+<h2>Factura</h2>
 
-<a class="boton" href="ventas.php">⬅ Volver</a>
-<a class="boton" href="dashboard.php">🏠 Panel</a>
+<p><b>Venta ID:</b> <?= $rowInfo['id_venta'] ?></p>
+<p><b>Cliente:</b> <?= $rowInfo['nombre'] ?></p>
+<p><b>Fecha:</b> <?= $rowInfo['fecha'] ?></p>
 
-<h2>🧾 FACTURA DE VENTA</h2>
-
-<p><b>Cliente:</b> <?php echo $venta['nombre']." ".$venta['apellido']; ?></p>
-<p><b>Fecha:</b> <?php echo $venta['fecha']; ?></p>
-<p><b>ID Venta:</b> #<?php echo $venta['id_venta']; ?></p>
-
-<table>
-
+<table border="1" width="100%">
 <tr>
     <th>Producto</th>
     <th>Cantidad</th>
-    <th>Precio Unitario</th>
+    <th>Precio</th>
     <th>Subtotal</th>
 </tr>
 
-<?php 
-$total = 0;
+<?php while($row = mysqli_fetch_assoc($result)) {
 
-while($d = mysqli_fetch_assoc($resDetalle)) { 
+$subtotal = $row['cantidad'] * $row['precio_unitario'];
+$total += $subtotal;
 
-    /* 🔥 CORRECCIÓN CLAVE */
-    $precio = $d['precio_unitario'];
-
-    $subtotal = $d['cantidad'] * $precio;
-    $total += $subtotal;
 ?>
 
 <tr>
-    <td><?php echo $d['nombre']; ?></td>
-    <td><?php echo $d['cantidad']; ?></td>
-    <td>$<?php echo $precio; ?></td>
-    <td>$<?php echo $subtotal; ?></td>
+    <td><?= $row['producto'] ?></td>
+    <td><?= $row['cantidad'] ?></td>
+    <td>$<?= number_format($row['precio_unitario'],2) ?></td>
+    <td>$<?= number_format($subtotal,2) ?></td>
 </tr>
 
 <?php } ?>
 
 </table>
 
-<div class="total">
-    <b>Total: $<?php echo $total; ?></b>
-</div>
-
-</div>
+<h3>Total: $<?= number_format($total,2) ?></h3>
 
 </body>
 </html>

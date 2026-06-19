@@ -1,93 +1,100 @@
 <?php
 session_start();
-include("../php/conexion.php");
+include(__DIR__ . "/../php/conexion.php");
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
+/* PROTEGER */
+if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'admin') {
+    header("Location: ../login.php");
     exit();
 }
 
-/* VENTAS CON TOTAL CALCULADO DESDE DETALLE */
-$sql = "SELECT v.id_venta, v.fecha, c.nombre, c.apellido,
-               SUM(d.cantidad * d.precio_unitario) AS total
-        FROM ventas v
-        INNER JOIN clientes c ON v.id_cliente = c.id_cliente
-        INNER JOIN detalle_ventas d ON v.id_venta = d.id_venta
-        GROUP BY v.id_venta, v.fecha, c.nombre, c.apellido
-        ORDER BY v.id_venta DESC";
+/* VENTAS */
+$sql = "
+SELECT 
+    v.id_venta,
+    v.fecha,
+    COALESCE(u.nombre, 'Sin usuario') AS nombre,
+    (
+        SELECT COALESCE(SUM(d.cantidad * d.precio_unitario),0)
+        FROM detalle_ventas d
+        WHERE d.id_venta = v.id_venta
+    ) AS total
+FROM ventas v
+LEFT JOIN usuarios u ON v.id_usuario = u.id_usuario
+ORDER BY v.id_venta DESC
+";
 
 $resultado = mysqli_query($conexion, $sql);
 
 if (!$resultado) {
-    die("Error SQL: " . mysqli_error($conexion));
+    die("ERROR SQL: " . mysqli_error($conexion));
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Ventas - Warrior Gym</title>
-
+<title>Ventas</title>
 <style>
 body{
     font-family: Arial;
-    background:#111;
-    color:white;
-    margin:0;
+    background: #111;
+    color: white;
+    margin: 0;
+    padding: 20px;
 }
 
 h2{
-    text-align:center;
-    margin-top:20px;
+    text-align: center;
+    color: #d40000;
 }
 
 table{
-    width:100%;
-    border-collapse:collapse;
-    background:#222;
-}
-
-th, td{
-    border:1px solid #444;
-    padding:10px;
-    text-align:center;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #1c1c1c;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th{
-    background:#d40000;
+    background: #d40000;
+    padding: 12px;
+    text-transform: uppercase;
 }
 
-.boton{
-    display:inline-block;
-    background:#444;
-    color:white;
-    padding:10px 15px;
-    text-decoration:none;
-    border-radius:5px;
-    margin:10px 5px;
+td{
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    text-align: center;
 }
 
-.boton:hover{
-    background:#d40000;
+tr:hover{
+    background: #2a2a2a;
+}
+
+a{
+    color: #00ff99;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover{
+    color: #00ffaa;
 }
 </style>
 </head>
 
 <body>
 
-<h2>💰 Ventas</h2>
+<h2>Ventas</h2>
 
-<div style="text-align:center;">
-    <a class="boton" href="nueva_venta.php">➕ Nueva Venta</a>
-    <a class="boton" href="dashboard.php">⬅ Volver al Panel</a>
-</div>
-
-<table>
-
+<table border="1" width="100%">
 <tr>
     <th>ID</th>
-    <th>Cliente</th>
+    <th>Cliente/Usuario</th>
     <th>Fecha</th>
     <th>Total</th>
     <th>Acciones</th>
@@ -96,17 +103,12 @@ th{
 <?php while($fila = mysqli_fetch_assoc($resultado)) { ?>
 
 <tr>
-    <td><?php echo $fila['id_venta']; ?></td>
-    <td><?php echo $fila['nombre']." ".$fila['apellido']; ?></td>
-    <td><?php echo $fila['fecha']; ?></td>
-
-    <!-- TOTAL CORREGIDO -->
-    <td>$<?php echo $fila['total'] ?? 0; ?></td>
-
+    <td><?= $fila['id_venta'] ?></td>
+    <td><?= $fila['nombre'] ?></td>
+    <td><?= $fila['fecha'] ?></td>
+    <td>$<?= number_format($fila['total'],2) ?></td>
     <td>
-        <a class="boton" href="factura.php?id=<?php echo $fila['id_venta']; ?>">
-            Ver Factura
-        </a>
+        <a href="factura.php?id=<?= $fila['id_venta'] ?>">Ver Factura</a>
     </td>
 </tr>
 

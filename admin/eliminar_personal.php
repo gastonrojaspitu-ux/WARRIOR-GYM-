@@ -2,13 +2,13 @@
 session_start();
 include("../php/conexion.php");
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: /warrior_gym/admin/login.php");
     exit();
 }
 
 if (!isset($_GET['id'])) {
-    header("Location: personal.php");
+    header("Location: /warrior_gym/admin/personal.php");
     exit();
 }
 

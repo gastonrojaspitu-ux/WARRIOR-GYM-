@@ -58,17 +58,17 @@
                         <a class="nav-link" href="clases.html">Clases</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="tienda.html">Tienda</a>
-                    </li>
+                   <li class="nav-item">  
+  <a class="nav-link" href="tienda.php">🛒 Visitar Tienda</a>
+</li>
 
                     <li class="nav-item">
                         <a class="nav-link" href="contacto.html">Contacto</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link btn-login" href="pages/login.html">Login</a>
-                    </li>
+                   <li class="nav-item">
+              <a class="nav-link btn-login" href="login.php">Login</a>
+            </li>
 
                 </ul>
 
@@ -709,83 +709,67 @@
 
             <div class="modal-body">
 
-                <form>
+                <form action="php/guardar_solicitud_membresia.php" method="POST">
 
-                    <div class="mb-3">
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input
+            type="text"
+            class="form-control"
+            name="nombre"
+            required>
+    </div>
 
-                        <label class="form-label">
-                            Nombre
-                        </label>
+    <div class="mb-3">
+        <label class="form-label">Apellido</label>
+        <input
+            type="text"
+            class="form-control"
+            name="apellido"
+            required>
+    </div>
 
-                        <input
-                            type="text"
-                            class="form-control">
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input
+            type="email"
+            class="form-control"
+            name="email"
+            required>
+    </div>
 
-                    </div>
+    <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input
+            type="tel"
+            class="form-control"
+            name="telefono"
+            required>
+    </div>
 
-                    <div class="mb-3">
+    <div class="mb-3">
+        <label class="form-label">Plan</label>
+        <select
+            class="form-select"
+            name="plan"
+            required>
 
-                        <label class="form-label">
-                            Apellido
-                        </label>
+            <option value="Básico">Básico</option>
+            <option value="Premium">Premium</option>
+            <option value="Elite">Elite</option>
 
-                        <input
-                            type="text"
-                            class="form-control">
+        </select>
+    </div>
 
-                    </div>
+    <button
+        type="submit"
+        class="btn btn-danger w-100">
 
-                    <div class="mb-3">
+        Enviar Solicitud
 
-                        <label class="form-label">
-                            Email
-                        </label>
+    </button>
 
-                        <input
-                            type="email"
-                            class="form-control">
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Teléfono
-                        </label>
-
-                        <input
-                            type="tel"
-                            class="form-control">
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Plan
-                        </label>
-
-                        <select class="form-select">
-
-                            <option>Básico</option>
-
-                            <option>Premium</option>
-
-                            <option>Elite</option>
-
-                        </select>
-
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="btn btn-danger w-100">
-
-                        Enviar Solicitud
-
-                    </button>
-
-                </form>
+</form>
 
             </div>
 

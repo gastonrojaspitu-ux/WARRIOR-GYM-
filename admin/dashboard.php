@@ -1,35 +1,28 @@
+
 <?php
 session_start();
+
 include("../php/conexion.php");
-if (!isset($_SESSION['usuario'])) {
+
+/* 🔐 PROTEGER PANEL */
+if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'admin') {
     header("Location: login.php");
     exit();
 }
-$clientes = mysqli_fetch_row(
-    mysqli_query($conexion, "SELECT COUNT(*) FROM clientes")
-)[0];
 
-$productos = mysqli_fetch_row(
-    mysqli_query($conexion, "SELECT COUNT(*) FROM productos")
-)[0];
+/* 📊 CONSULTAS */
+$clientes = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM clientes"))[0];
 
-$membresias = mysqli_fetch_row(
-    mysqli_query($conexion, "SELECT COUNT(*) FROM membresias")
-)[0];
+$productos = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM productos"))[0];
 
-$ventas = mysqli_fetch_row(
-    mysqli_query($conexion, "SELECT COUNT(*) FROM ventas")
-)[0];
+$membresias = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM membresias"))[0];
 
-$reservas = mysqli_fetch_row(
-    mysqli_query($conexion, "SELECT COUNT(*) FROM reservas")
-)[0];
+$ventas = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM ventas"))[0];
 
-$personal = mysqli_fetch_row(
-    mysqli_query($conexion, "SELECT COUNT(*) FROM personal")
-)[0];
+$reservas = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM reservas"))[0];
+
+$personal = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM personal"))[0];
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -85,7 +78,7 @@ a{
 
 <div class="contenido">
 
-    <h2>Bienvenido <?php echo $_SESSION['usuario']; ?></h2>
+    <h2>Bienvenido <?php echo $_SESSION['nombre']; ?></h2>
 
   <!-- ===== USUARIOS ===== -->
 <h2>👤 Usuarios</h2>
@@ -114,7 +107,12 @@ a{
     <div class="tarjeta">➕ Asignar Membresía</div>
 </a>
 
-
+<a href="solicitudes_membresia.php" style="text-decoration:none; color:white;">
+    <div class="tarjeta">📩 Solicitudes de Membresía</div>
+</a>
+<a href="rutinas.php" style="text-decoration:none; color:white;">
+    <div class="tarjeta">🏋 Rutinas</div>
+</a>
 <!-- ===== TIENDA ===== -->
 <h2>📦 Tienda</h2>
 
@@ -129,7 +127,9 @@ a{
 <a href="ventas.php" style="text-decoration:none; color:white;">
     <div class="tarjeta">💰 Ventas: <?php echo $ventas; ?></div>
 </a>
-
+<a href="pagos.php" style="text-decoration:none; color:white;">
+    <div class="tarjeta">💰 Pagos de Clientes</div>
+</a>
 <a href="reservas.php" style="text-decoration:none; color:white;">
     <div class="tarjeta">📅 Reservas: <?php echo $reservas; ?></div>
 </a>

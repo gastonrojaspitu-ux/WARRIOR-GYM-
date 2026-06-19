@@ -2,8 +2,8 @@
 session_start();
 include("../php/conexion.php");
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: /warrior_gym/admin/login.php");
     exit();
 }
 
@@ -111,6 +111,15 @@ button{
 
     <button type="submit">Guardar Cambios</button>
 
+  <a href="dar_acceso.php?id=<?= $cliente['id_cliente'] ?>"
+   onclick="return confirm('¿Dar acceso a este cliente al sistema?');">
+
+    <button type="button">
+        Dar acceso
+    </button>
+
+</a>
+    
 </form>
 
 </body>

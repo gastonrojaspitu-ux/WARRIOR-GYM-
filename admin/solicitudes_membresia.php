@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 include("../php/conexion.php");
 
 if (!isset($_SESSION['id_usuario'])) {
@@ -7,7 +8,7 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-$sql = "SELECT * FROM clientes";
+$sql = "SELECT * FROM solicitudes_membresia ORDER BY id_solicitud DESC";
 $resultado = mysqli_query($conexion, $sql);
 ?>
 
@@ -16,7 +17,7 @@ $resultado = mysqli_query($conexion, $sql);
 
 <head>
 <meta charset="UTF-8">
-<title>Clientes - Warrior Gym</title>
+<title>Solicitudes de Membresía - Warrior Gym</title>
 
 <style>
 
@@ -45,7 +46,7 @@ table{
 
 th, td{
     border:1px solid #444;
-    padding:10px;
+    padding:12px;
     text-align:center;
 }
 
@@ -68,14 +69,15 @@ th{
 <body>
 
 <div class="header">
-    <h1>CLIENTES - WARRIOR GYM</h1>
+    <h1>SOLICITUDES DE MEMBRESÍA</h1>
 </div>
 
 <div class="contenido">
 
     <p>
-        <a class="boton" href="dashboard.php">Volver al Panel</a>
-        <a class="boton" href="nuevo_cliente.php">+ Nuevo Cliente</a>
+        <a class="boton" href="dashboard.php">
+            Volver al Panel
+        </a>
     </p>
 
     <table>
@@ -84,34 +86,22 @@ th{
             <th>ID</th>
             <th>Nombre</th>
             <th>Apellido</th>
-            <th>Documento</th>
-            <th>Teléfono</th>
             <th>Email</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>Teléfono</th>
+            <th>Plan Solicitado</th>
+            <th>Fecha Solicitud</th>
         </tr>
 
         <?php while($fila = mysqli_fetch_assoc($resultado)) { ?>
 
         <tr>
-            <td><?php echo $fila['id_cliente']; ?></td>
+            <td><?php echo $fila['id_solicitud']; ?></td>
             <td><?php echo $fila['nombre']; ?></td>
             <td><?php echo $fila['apellido']; ?></td>
-            <td><?php echo $fila['numero_documento']; ?></td>
-            <td><?php echo $fila['telefono']; ?></td>
             <td><?php echo $fila['email']; ?></td>
-            <td><?php echo $fila['estado']; ?></td>
-
-            <td>
-                <a class="boton" href="editar_cliente.php?id=<?php echo $fila['id_cliente']; ?>">
-                    Editar
-                </a>
-
-                <a class="boton" href="eliminar_cliente.php?id=<?php echo $fila['id_cliente']; ?>"
-                   onclick="return confirm('¿Eliminar cliente?');">
-                    Eliminar
-                </a>
-            </td>
+            <td><?php echo $fila['telefono']; ?></td>
+            <td><?php echo $fila['plan_solicitado']; ?></td>
+            <td><?php echo $fila['fecha_solicitud']; ?></td>
         </tr>
 
         <?php } ?>
