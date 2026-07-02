@@ -1,8 +1,19 @@
 ﻿<?php
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include(__DIR__ . "/php/conexion.php");
+
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_cliente'])) {
+    header("Location: login.php");
+    exit();
+}
+
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'cliente') {
+    header("Location: login.php");
+    exit();
+}
 
 $sql = "SELECT * FROM productos ORDER BY id_producto";
 $resultado = mysqli_query($conexion, $sql);
@@ -42,7 +53,7 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
     $productos[] = [
         "id" => (int)$fila["id_producto"],
         "nombre" => $fila["nombre"],
-        "descripcion" => $fila["descripcion"],
+        "descripcion" => $fila["descripcion"] ?? "",
         "precio" => (float)$fila["precio"],
         "stock" => (int)$fila["stock"],
         "imagen" => $imagen
@@ -57,103 +68,110 @@ while ($fila = mysqli_fetch_assoc($resultado)) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tienda Warrior Gym</title>
+<title>Tienda - Warrior Gym</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
 <style>
-
-body{
-    background:#0f0f0f;
-    color:white;
+body {
+    background: #0f0f0f;
+    color: white;
 }
 
-.navbar{
-    background:#111;
+.navbar {
+    background: #111;
+    border-bottom: 1px solid #222;
 }
 
-.product-card{
-    background:#181818;
-    border:none;
-    border-radius:20px;
-    overflow:hidden;
-    transition:.3s;
-    height:100%;
+.hero {
+    background:
+        linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.85)),
+        url('img/gym-principal.jpg') center/cover;
+    padding: 90px 0;
 }
 
-.product-card:hover{
-    transform:translateY(-8px);
+.hero h1 {
+    color: #dc3545;
+    font-weight: 900;
+    letter-spacing: 1px;
 }
 
-.product-card img{
-    height:260px;
-    width:100%;
-    object-fit:contain;
-    background:white;
-    padding:15px;
+.product-card {
+    background: #181818;
+    border: 1px solid #252525;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: .3s;
+    height: 100%;
 }
 
-.product-card .card-body{
-    display:flex;
-    flex-direction:column;
+.product-card:hover {
+    transform: translateY(-6px);
+    border-color: #dc3545;
+    box-shadow: 0 10px 25px rgba(220,53,69,.25);
 }
 
-.product-card h5{
-    color:white;
+.product-card img {
+    height: 240px;
+    width: 100%;
+    object-fit: contain;
+    background: #fff;
+    padding: 15px;
 }
 
-.product-card p{
-    color:#bbb;
-    flex-grow:1;
+.product-card .card-body {
+    display: flex;
+    flex-direction: column;
 }
 
-.price{
-    color:#dc3545;
-    font-size:1.6rem;
-    font-weight:bold;
+.product-card p {
+    color: #bbb;
+    flex-grow: 1;
 }
 
-.cart{
-    background:#181818;
-    border-radius:20px;
-    padding:20px;
-    position:sticky;
-    top:20px;
+.price {
+    color: #dc3545;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
-.cart-item{
-    border-bottom:1px solid #333;
-    padding:10px 0;
+.cart {
+    background: #181818;
+    border: 1px solid #252525;
+    border-radius: 20px;
+    padding: 22px;
+    position: sticky;
+    top: 20px;
 }
 
-.cart-total{
-    font-size:1.4rem;
-    font-weight:bold;
-    color:#dc3545;
+.cart-item {
+    border-bottom: 1px solid #333;
+    padding: 12px 0;
 }
 
-.badge-stock{
-    background:#198754;
+.cart-total {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #dc3545;
 }
 
-.hero{
-    background:url('img/gym-principal.jpg') center/cover;
-    padding:100px 0;
-    position:relative;
+.form-control {
+    background: #111;
+    border: 1px solid #333;
+    color: white;
 }
 
-.hero::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.7);
+.form-control:focus {
+    background: #111;
+    color: white;
+    border-color: #dc3545;
+    box-shadow: none;
 }
 
-.hero .container{
-    position:relative;
-    z-index:2;
+.form-control::placeholder {
+    color: #999;
 }
-
 </style>
 
 </head>
@@ -161,114 +179,113 @@ body{
 <body>
 
 <nav class="navbar navbar-dark navbar-expand-lg">
-<div class="container">
+    <div class="container">
 
-<a class="navbar-brand fw-bold" href="index.html">
-🏋️ Warrior Gym
-</a>
+        <a class="navbar-brand fw-bold" href="dashboard_usuario.php">
+            🏋️ Warrior Gym
+        </a>
 
-<div class="navbar-nav ms-auto">
-<a class="nav-link text-white" href="index.html">Inicio</a>
-<a class="nav-link text-white" href="nosotros.html">Nosotros</a>
-<a class="nav-link text-white" href="membresias.html">Planes</a>
-<a class="nav-link text-white" href="clases.html">Clases</a>
-<a class="nav-link text-white" href="contacto.html">Contacto</a>
-</div>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link text-white" href="dashboard_usuario.php">Panel</a>
+            <a class="nav-link text-white" href="clientes_mis_compras.php">Mis compras</a>
+            <a class="nav-link text-white" href="/warrior_gym/logout.php">Cerrar sesión</a>
+        </div>
 
-</div>
+    </div>
 </nav>
 
 <section class="hero">
-<div class="container text-center">
-<h1 class="display-4 fw-bold">
-TIENDA OFICIAL WARRIOR GYM
-</h1>
-
-<p class="lead">
-Suplementos deportivos premium para potenciar tus resultados.
-</p>
-</div>
+    <div class="container text-center">
+        <h1 class="display-5">TIENDA OFICIAL WARRIOR GYM</h1>
+        <p class="lead text-light">
+            Suplementos deportivos para potenciar tus entrenamientos.
+        </p>
+    </div>
 </section>
 
 <div class="container py-5">
 
-<div class="row">
+    <div class="row g-4">
 
-<div class="col-lg-8">
+        <div class="col-lg-8">
 
-<div class="mb-4">
-    <input
-        type="text"
-        id="buscador"
-        class="form-control"
-        placeholder="Buscar suplementos...">
-</div>
+            <div class="mb-4">
+                <input
+                    type="text"
+                    id="buscador"
+                    class="form-control form-control-lg"
+                    placeholder="Buscar suplementos...">
+            </div>
 
-<div class="row g-4" id="productosContainer">
-</div>
+            <div class="row g-4" id="productosContainer"></div>
 
-</div>
+        </div>
 
-<div class="col-lg-4">
+        <div class="col-lg-4">
 
-<div class="cart">
+            <div class="cart">
 
-<h3>🛒 Carrito</h3>
+                <h3 class="text-danger mb-3">
+                    <i class="bi bi-cart-fill"></i> Carrito
+                </h3>
 
-<div id="cartItems">
-<p class="text-secondary">
-No hay productos.
-</p>
-</div>
+                <div id="cartItems">
+                    <p class="text-secondary">No hay productos.</p>
+                </div>
 
-<hr>
+                <hr>
 
-<p>
-Cantidad:
-<strong id="cantidad">0</strong>
-</p>
+                <p>
+                    Cantidad:
+                    <strong id="cantidad">0</strong>
+                </p>
 
-<p class="cart-total">
-Total:
-<span id="total">$0</span>
-</p>
+                <p class="cart-total">
+                    Total:
+                    <span id="total">$0</span>
+                </p>
 
-<button class="btn btn-danger w-100 mb-2" onclick="vaciarCarrito()">
-Vaciar carrito
-</button>
+                <button class="btn btn-danger w-100 mb-2" onclick="vaciarCarrito()">
+                    Vaciar carrito
+                </button>
 
-<button
-class="btn btn-success w-100"
-onclick="finalizarCompra()">
-Finalizar compra
-</button>
+                <button class="btn btn-success w-100" onclick="finalizarCompra()">
+                    Finalizar compra
+                </button>
 
-</div>
+            </div>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 
 <script>
-
-const productos = <?php echo json_encode($productos, JSON_UNESCAPED_UNICODE); ?>;
+const productos = <?php echo json_encode($productos, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 
 const container = document.getElementById("productosContainer");
 const buscador = document.getElementById("buscador");
 
-/* ✔ CARRITO ESTABLE */
 let carrito = [];
 
-function formato(precio){
-    return "$" + Number(precio).toLocaleString("es-AR");
+function formato(precio) {
+    return "$" + Number(precio).toLocaleString("es-AR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
-/* =========================
-   PRODUCTOS
-========================= */
-function renderProductos(){
+function escaparHTML(texto) {
+    return String(texto)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function renderProductos() {
 
     const texto = buscador.value.toLowerCase();
 
@@ -277,78 +294,101 @@ function renderProductos(){
         p.descripcion.toLowerCase().includes(texto)
     );
 
-    container.innerHTML = productosFiltrados.map(p => `
-
-    <div class="col-md-6">
-        <div class="card product-card">
-
-            <img src="img/${p.imagen}" alt="${p.nombre}">
-
-            <div class="card-body">
-
-                <h5>${p.nombre}</h5>
-                <p>${p.descripcion}</p>
-
-                <span class="badge badge-stock mb-2">
-                    Stock: ${p.stock}
-                </span>
-
-                <div class="price mb-3">
-                    ${formato(p.precio)}
+    if (productosFiltrados.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-dark border border-danger text-center text-white">
+                    No se encontraron productos.
                 </div>
-
-                <button class="btn btn-warning"
-                        onclick="agregar(${p.id})">
-                    Agregar al carrito
-                </button>
-
             </div>
+        `;
+        return;
+    }
 
-        </div>
-    </div>
+    container.innerHTML = productosFiltrados.map(p => {
 
-    `).join('');
+        const sinStock = p.stock <= 0;
+
+        return `
+            <div class="col-md-6">
+                <div class="card product-card">
+
+                    <img src="img/${escaparHTML(p.imagen)}" alt="${escaparHTML(p.nombre)}">
+
+                    <div class="card-body">
+
+                        <h5>${escaparHTML(p.nombre)}</h5>
+
+                        <p>${escaparHTML(p.descripcion)}</p>
+
+                        <span class="badge ${sinStock ? 'bg-danger' : 'bg-success'} mb-2">
+                            ${sinStock ? 'Sin stock' : 'Stock: ' + p.stock}
+                        </span>
+
+                        <div class="price mb-3">
+                            ${formato(p.precio)}
+                        </div>
+
+                        <button 
+                            class="btn ${sinStock ? 'btn-secondary' : 'btn-warning'} mt-auto"
+                            onclick="agregar(${p.id})"
+                            ${sinStock ? 'disabled' : ''}>
+                            ${sinStock ? 'No disponible' : 'Agregar al carrito'}
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-/* =========================
-   AGREGAR AL CARRITO
-========================= */
-function agregar(id){
+function agregar(id) {
 
-    const producto = productos.find(p => p.id == id);
+    const producto = productos.find(p => Number(p.id) === Number(id));
 
-    if(!producto) return;
+    if (!producto) return;
 
-    if(carrito[id]){
+    if (producto.stock <= 0) {
+        alert("Producto sin stock");
+        return;
+    }
 
-        carrito[id].cantidad++;
+    const item = carrito.find(p => Number(p.id) === Number(id));
 
-    }else{
+    if (item) {
 
-        carrito[id] = {
+        if (item.cantidad >= producto.stock) {
+            alert("No hay más stock disponible de este producto.");
+            return;
+        }
+
+        item.cantidad++;
+
+    } else {
+
+        carrito.push({
             id: producto.id,
             nombre: producto.nombre,
-            precio: Number(producto.precio), // 🔥 IMPORTANTE
+            precio: Number(producto.precio),
+            stock: Number(producto.stock),
             cantidad: 1
-        };
+        });
     }
 
     actualizarCarrito();
 }
-/* =========================
-   ACTUALIZAR CARRITO
-========================= */
-function actualizarCarrito(){
+
+function actualizarCarrito() {
 
     const cartItems = document.getElementById("cartItems");
 
-    if(carrito.length === 0){
+    if (carrito.length === 0) {
 
         cartItems.innerHTML = "<p class='text-secondary'>No hay productos.</p>";
-
         document.getElementById("cantidad").textContent = 0;
         document.getElementById("total").textContent = "$0";
-
         return;
     }
 
@@ -364,86 +404,92 @@ function actualizarCarrito(){
         cantidadTotal += item.cantidad;
 
         html += `
-        <div class="cart-item">
+            <div class="cart-item">
 
-            <strong>${item.nombre}</strong>
+                <strong>${escaparHTML(item.nombre)}</strong>
 
-            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="d-flex align-items-center gap-2 my-2">
 
-                <button class="btn btn-sm btn-secondary"
-                        onclick="disminuir(${item.id})">
-                    ➖
-                </button>
+                    <button class="btn btn-sm btn-secondary" onclick="disminuir(${item.id})">
+                        -
+                    </button>
 
-                <strong>${item.cantidad}</strong>
+                    <strong>${item.cantidad}</strong>
 
-                <button class="btn btn-sm btn-success"
-                        onclick="aumentar(${item.id})">
-                    ➕
+                    <button class="btn btn-sm btn-success" onclick="aumentar(${item.id})">
+                        +
+                    </button>
+
+                </div>
+
+                <p class="mb-2">Subtotal: ${formato(subtotal)}</p>
+
+                <button class="btn btn-sm btn-danger" onclick="eliminar(${item.id})">
+                    Eliminar
                 </button>
 
             </div>
-
-            <p>Subtotal: ${formato(subtotal)}</p>
-
-            <button class="btn btn-sm btn-danger"
-                    onclick="eliminar(${item.id})">
-                Eliminar
-            </button>
-
-        </div>
         `;
     });
 
     cartItems.innerHTML = html;
-
     document.getElementById("cantidad").textContent = cantidadTotal;
     document.getElementById("total").textContent = formato(total);
 }
 
-/* =========================
-   CONTROLES
-========================= */
-function eliminar(id){
-    carrito = carrito.filter(p => p.id != id);
+function eliminar(id) {
+    carrito = carrito.filter(p => Number(p.id) !== Number(id));
     actualizarCarrito();
 }
 
-function aumentar(id){
-    const item = carrito.find(p => p.id == id);
+function aumentar(id) {
+
+    const item = carrito.find(p => Number(p.id) === Number(id));
+
+    if (!item) return;
+
+    if (item.cantidad >= item.stock) {
+        alert("No hay más stock disponible de este producto.");
+        return;
+    }
+
     item.cantidad++;
     actualizarCarrito();
 }
 
-function disminuir(id){
-    const item = carrito.find(p => p.id == id);
+function disminuir(id) {
+
+    const item = carrito.find(p => Number(p.id) === Number(id));
+
+    if (!item) return;
 
     item.cantidad--;
 
-    if(item.cantidad <= 0){
-        carrito = carrito.filter(p => p.id != id);
+    if (item.cantidad <= 0) {
+        carrito = carrito.filter(p => Number(p.id) !== Number(id));
     }
 
     actualizarCarrito();
 }
 
-function vaciarCarrito(){
+function vaciarCarrito() {
     carrito = [];
     actualizarCarrito();
 }
 
-/* =========================
-   FINALIZAR COMPRA (CLAVE)
-========================= */
-
 function finalizarCompra() {
 
-    const items = Object.values(carrito);
-
-    if (items.length === 0) {
-        alert("Carrito vacío");
+    if (carrito.length === 0) {
+        alert("El carrito está vacío.");
         return;
     }
+
+    const items = carrito.map(item => ({
+        id: item.id,
+        nombre: item.nombre,
+        precio: item.precio,
+        cantidad: item.cantidad
+    }));
 
     fetch("procesar_venta.php", {
         method: "POST",
@@ -454,15 +500,26 @@ function finalizarCompra() {
     })
     .then(r => r.text())
     .then(d => {
-        console.log(d);
-        alert("Compra realizada");
 
-        carrito = {};
-        actualizarCarrito();
+        console.log("RESPUESTA PHP:", d);
+
+        if (d.trim() === "OK") {
+
+            alert("Compra realizada correctamente.");
+
+            carrito = [];
+            actualizarCarrito();
+
+            window.location.href = "clientes_mis_compras.php";
+
+        } else {
+            alert("Error en la compra: " + d);
+        }
+
     })
     .catch(err => {
         console.log(err);
-        alert("Error en la compra");
+        alert("Error al procesar la compra.");
     });
 }
 
@@ -470,8 +527,9 @@ buscador.addEventListener("keyup", renderProductos);
 
 renderProductos();
 actualizarCarrito();
-
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

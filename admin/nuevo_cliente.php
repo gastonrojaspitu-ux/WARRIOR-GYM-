@@ -43,10 +43,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         '1234'
     )";
 
-    mysqli_query($conexion, $sql);
+   mysqli_query($conexion, $sql);
 
-    header("Location: clientes.php");
-    exit();
+/* CREAR USUARIO PARA LOGIN */
+$sqlUsuario = "INSERT INTO usuarios
+(
+    nombre,
+    email,
+    password,
+    rol,
+    estado
+)
+VALUES
+(
+    '$nombre',
+    '$email',
+    '1234',
+    'cliente',
+    'Activo'
+)";
+
+mysqli_query($conexion, $sqlUsuario);
+
+header("Location: clientes.php");
+exit();
 }
 ?>
 

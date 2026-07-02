@@ -1,41 +1,104 @@
 <?php
 session_start();
-include("../php/conexion.php");
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if (!isset($_SESSION['id_usuario'])) {
-    header("Location: /warrior_gym/admin/login.php");
+include(__DIR__ . "/../php/conexion.php");
+
+/* PROTEGER SOLO ADMIN */
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+    header("Location: ../login.php");
     exit();
 }
 
-/* Traer cargos */
-$cargos = mysqli_query($conexion, "SELECT * FROM cargos");
+$error = "";
 
+/* TRAER TIPOS DE DOCUMENTO */
+$tipos_documento = mysqli_query($conexion, "
+    SELECT * 
+    FROM tipo_documento 
+    ORDER BY id_tipo_documento
+");
+
+if (!$tipos_documento) {
+    die("Error al cargar tipos de documento: " . mysqli_error($conexion));
+}
+
+/* GUARDAR PERSONAL */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $nombre = $_POST['nombre'];
-    $apellido = $_POST['apellido'];
-    $usuario = $_POST['usuario'];
-    $email = $_POST['email'];
-    $estado = $_POST['estado'];
-    $id_cargo = $_POST['id_cargo'];
+    $id_tipo_documento = intval($_POST['id_tipo_documento']);
+    $numero_documento = trim($_POST['numero_documento']);
+    $nombre = trim($_POST['nombre']);
+    $apellido = trim($_POST['apellido']);
+    $telefono = trim($_POST['telefono']);
+    $email = trim($_POST['email']);
+    $usuario = trim($_POST['usuario']);
+    $contrasena = trim($_POST['contrasena']);
+    $estado = trim($_POST['estado']);
 
-    // 1. Insertar personal
-    $sql = "INSERT INTO personal (nombre, apellido, usuario, email, estado)
-            VALUES ('$nombre', '$apellido', '$usuario', '$email', '$estado')";
+    if ($id_tipo_documento <= 0 || $numero_documento == "" || $nombre == "" || $apellido == "" || $usuario == "" || $contrasena == "" || $estado == "") {
 
-    mysqli_query($conexion, $sql);
+        $error = "Completá todos los campos obligatorios.";
 
-    // 2. Obtener ID del personal recién creado
-    $id_personal = mysqli_insert_id($conexion);
+    } else {
 
-    // 3. Relacionar con cargo
-    $sql2 = "INSERT INTO personal_cargo (id_personal, id_cargo)
-             VALUES ('$id_personal', '$id_cargo')";
+        /* VALIDAR DOCUMENTO REPETIDO */
+        $sqlDoc = "SELECT id_personal FROM personal WHERE numero_documento = '$numero_documento' LIMIT 1";
+        $resDoc = mysqli_query($conexion, $sqlDoc);
 
-    mysqli_query($conexion, $sql2);
+        if ($resDoc && mysqli_num_rows($resDoc) > 0) {
 
-    header("Location: personal.php");
-    exit();
+            $error = "Ya existe un personal con ese número de documento.";
+
+        } else {
+
+            /* VALIDAR USUARIO REPETIDO */
+            $sqlUsuario = "SELECT id_personal FROM personal WHERE usuario = '$usuario' LIMIT 1";
+            $resUsuario = mysqli_query($conexion, $sqlUsuario);
+
+            if ($resUsuario && mysqli_num_rows($resUsuario) > 0) {
+
+                $error = "Ya existe un personal con ese usuario.";
+
+            } else {
+
+                /* VALIDAR EMAIL REPETIDO SOLO SI SE CARGÓ */
+                if ($email != "") {
+                    $sqlEmail = "SELECT id_personal FROM personal WHERE email = '$email' LIMIT 1";
+                    $resEmail = mysqli_query($conexion, $sqlEmail);
+
+                    if ($resEmail && mysqli_num_rows($resEmail) > 0) {
+                        $error = "Ya existe un personal con ese email.";
+                    }
+                }
+
+                if ($error == "") {
+
+                    $contrasena_hash = password_hash($contrasena, PASSWORD_DEFAULT);
+
+                    $sql = "INSERT INTO personal 
+                    (id_tipo_documento, numero_documento, nombre, apellido, telefono, email, usuario, contrasena, estado)
+                    VALUES 
+                    ('$id_tipo_documento', '$numero_documento', '$nombre', '$apellido', '$telefono', '$email', '$usuario', '$contrasena_hash', '$estado')";
+
+                    if (mysqli_query($conexion, $sql)) {
+                        echo "<script>
+                            alert('Personal registrado correctamente.');
+                            window.location='personal.php';
+                        </script>";
+                        exit();
+                    } else {
+                        $error = "Error al registrar personal: " . mysqli_error($conexion);
+                    }
+                }
+            }
+        }
+    }
+}
+
+function valor($dato) {
+    return htmlspecialchars($dato ?? '');
 }
 ?>
 
@@ -43,75 +106,142 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Nuevo Personal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nuevo Personal - Warrior Gym</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{
-    font-family: Arial;
-    background:#111;
-    color:white;
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    margin: 0;
 }
 
-h2{
-    text-align:center;
+.header {
+    background: #d40000;
+    padding: 25px;
+    text-align: center;
 }
 
-form{
-    width:400px;
-    margin:40px auto;
-    background:#222;
-    padding:20px;
-    border-radius:10px;
+.header h1 {
+    margin: 0;
+    font-weight: bold;
 }
 
-input, select{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
+.form-box {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #1c1c1c;
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    box-shadow: 0 0 20px rgba(220,53,69,0.20);
 }
 
-button{
-    width:100%;
-    padding:10px;
-    background:#d40000;
-    color:white;
-    border:none;
-    cursor:pointer;
+.form-control,
+.form-select {
+    background: #111;
+    color: white;
+    border: 1px solid #333;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: #111;
+    color: white;
+    border-color: #dc3545;
+    box-shadow: none;
+}
+
+.btn-warrior {
+    background: #d40000;
+    color: white;
+    border: none;
+}
+
+.btn-warrior:hover {
+    background: #ff1a1a;
+    color: white;
 }
 </style>
 </head>
 
 <body>
 
-<h2>➕ Nuevo Personal</h2>
+<div class="header">
+    <h1>➕ Nuevo Personal</h1>
+</div>
 
-<form method="POST">
+<div class="container">
 
-    <input type="text" name="nombre" placeholder="Nombre" required>
+    <div class="form-box">
 
-    <input type="text" name="apellido" placeholder="Apellido" required>
+        <div class="mb-3">
+            <a href="personal.php" class="btn btn-outline-light btn-sm">
+                ⬅ Volver a Personal
+            </a>
+        </div>
 
-    <input type="text" name="usuario" placeholder="Usuario" required>
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger text-center">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
 
-    <input type="email" name="email" placeholder="Email">
+        <form method="POST">
 
-    <select name="estado" required>
-        <option value="Activo">Activo</option>
-        <option value="Inactivo">Inactivo</option>
-    </select>
+            <label class="mb-1">Tipo de documento</label>
+            <select name="id_tipo_documento" class="form-select mb-3" required>
+                <option value="">Seleccionar tipo</option>
 
-    <label>Cargo</label>
-    <select name="id_cargo" required>
-        <?php while($c = mysqli_fetch_assoc($cargos)) { ?>
-            <option value="<?php echo $c['id_cargo']; ?>">
-                <?php echo $c['nombre_cargo']; ?>
-            </option>
-        <?php } ?>
-    </select>
+                <?php while($td = mysqli_fetch_assoc($tipos_documento)): ?>
+                    <option value="<?= $td['id_tipo_documento'] ?>">
+                        <?= htmlspecialchars($td['descripcion']) ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
-    <button type="submit">Guardar Personal</button>
+            <label class="mb-1">Número de documento</label>
+            <input type="text" name="numero_documento" class="form-control mb-3" placeholder="Ej: 45123456" value="<?= valor($_POST['numero_documento'] ?? '') ?>" required>
 
-</form>
+            <label class="mb-1">Nombre</label>
+            <input type="text" name="nombre" class="form-control mb-3" placeholder="Nombre" value="<?= valor($_POST['nombre'] ?? '') ?>" required>
+
+            <label class="mb-1">Apellido</label>
+            <input type="text" name="apellido" class="form-control mb-3" placeholder="Apellido" value="<?= valor($_POST['apellido'] ?? '') ?>" required>
+
+            <label class="mb-1">Teléfono</label>
+            <input type="text" name="telefono" class="form-control mb-3" placeholder="Teléfono" value="<?= valor($_POST['telefono'] ?? '') ?>">
+
+            <label class="mb-1">Email</label>
+            <input type="email" name="email" class="form-control mb-3" placeholder="Email" value="<?= valor($_POST['email'] ?? '') ?>">
+
+            <label class="mb-1">Usuario</label>
+            <input type="text" name="usuario" class="form-control mb-3" placeholder="Usuario" value="<?= valor($_POST['usuario'] ?? '') ?>" required>
+
+            <label class="mb-1">Contraseña</label>
+            <input type="password" name="contrasena" class="form-control mb-3" placeholder="Contraseña" required>
+
+            <label class="mb-1">Estado</label>
+            <select name="estado" class="form-select mb-3" required>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+            </select>
+
+            <button type="submit" class="btn btn-warrior w-100">
+                Guardar Personal
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

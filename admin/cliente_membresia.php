@@ -90,7 +90,6 @@ tr:hover{
 <a href="dashboard.php" class="boton-volver">
     ⬅ Volver al Panel
 </a>
-<a class="boton" href="nueva_cliente_membresia.php">+ Asignar Membresía</a>
 
 <table>
 

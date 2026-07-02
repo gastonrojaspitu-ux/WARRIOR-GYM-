@@ -8,8 +8,8 @@ if (!isset($_SESSION['id_usuario'])) {
 }
 
 $clientes = mysqli_query($conexion, "SELECT * FROM clientes");
+$rutinas = mysqli_query($conexion, "SELECT * FROM rutinas");
 
-$id_rutina = isset($_GET['id_rutina']) ? $_GET['id_rutina'] : 0;
 ?>
 
 <!DOCTYPE html>
@@ -64,18 +64,11 @@ button{
 
     <select name="id_rutina" required>
         <option value="">Seleccionar rutina</option>
-
-        <?php
-        $rutinas = mysqli_query($conexion, "SELECT * FROM rutinas");
-
-        while($r = mysqli_fetch_assoc($rutinas)) {
-        ?>
-            <option value="<?= $r['id_rutina'] ?>"
-                <?= ($r['id_rutina'] == $id_rutina) ? 'selected' : '' ?>>
+        <?php while($r = mysqli_fetch_assoc($rutinas)) { ?>
+            <option value="<?= $r['id_rutina'] ?>">
                 <?= $r['nombre_rutina'] ?>
             </option>
         <?php } ?>
-
     </select>
 
     <input type="date" name="fecha_inicio" required>
@@ -93,8 +86,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $inicio = $_POST['fecha_inicio'];
     $fin = $_POST['fecha_fin'];
 
-    $sql = "INSERT INTO rutinas_cliente (id_cliente, id_rutina, fecha_inicio, fecha_fin)
-            VALUES ('$id_cliente', '$id_rutina', '$inicio', '$fin')";
+    // 🔥 CORREGIDO: tabla correcta
+    $sql = "INSERT INTO rutina_asignada 
+    (id_cliente, nombre_rutina, descripcion, fecha_asignacion, estado)
+    VALUES 
+    (
+        '$id_cliente',
+        (SELECT nombre_rutina FROM rutinas WHERE id_rutina='$id_rutina'),
+        (SELECT descripcion FROM rutinas WHERE id_rutina='$id_rutina'),
+        '$inicio',
+        'Activa'
+    )";
 
     if (mysqli_query($conexion, $sql)) {
         echo "<script>alert('Rutina asignada correctamente'); window.location='rutinas.php';</script>";

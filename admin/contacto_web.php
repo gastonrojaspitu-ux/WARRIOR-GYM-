@@ -11,36 +11,33 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['ro
     exit();
 }
 
-/* LISTAR MEMBRESÍAS */
-$sql = "SELECT * FROM membresias ORDER BY id_membresia ASC";
+$sql = "SELECT * FROM contacto_web ORDER BY fecha_envio DESC";
 $resultado = mysqli_query($conexion, $sql);
 
 if (!$resultado) {
     die("Error SQL: " . mysqli_error($conexion));
 }
 
-function formatoPrecio($precio) {
-    return "$" . number_format($precio, 2, ",", ".");
+function formatoFecha($fecha) {
+    return date("d/m/Y H:i", strtotime($fecha));
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Membresías - Warrior Gym</title>
+<title>Mensajes de Contacto - Warrior Gym</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 body {
-    font-family: Arial, sans-serif;
     background: #111;
     color: white;
-    margin: 0;
+    font-family: Arial, sans-serif;
 }
 
 .header {
@@ -70,13 +67,12 @@ body {
     color: white;
 }
 </style>
-
 </head>
 
 <body>
 
 <div class="header">
-    <h1>🏋 MEMBRESÍAS - WARRIOR GYM</h1>
+    <h1>📩 Mensajes de Contacto</h1>
 </div>
 
 <div class="contenido">
@@ -85,15 +81,11 @@ body {
         <a href="dashboard.php" class="btn btn-outline-light">
             ⬅ Volver al Panel
         </a>
-
-        <a href="pagos.php" class="btn btn-danger">
-            💳 Registrar Pago / Activar Membresía
-        </a>
     </div>
 
     <div class="table-box">
 
-        <h3 class="text-danger mb-4">Planes de Membresía</h3>
+        <h3 class="text-danger mb-4">Consultas recibidas</h3>
 
         <?php if (mysqli_num_rows($resultado) > 0): ?>
 
@@ -104,9 +96,11 @@ body {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nombre del Plan</th>
-                            <th>Precio</th>
-                            <th>Descripción</th>
+                            <th>Fecha</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Asunto</th>
+                            <th>Mensaje</th>
                         </tr>
                     </thead>
 
@@ -115,18 +109,26 @@ body {
                         <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
 
                             <tr>
-                                <td><?= $fila['id_membresia'] ?></td>
+                                <td><?= $fila['id_contacto'] ?></td>
 
                                 <td>
-                                    <strong><?= htmlspecialchars($fila['nombre']) ?></strong>
+                                    <?= formatoFecha($fila['fecha_envio']) ?>
                                 </td>
 
                                 <td>
-                                    <?= formatoPrecio($fila['precio']) ?>
+                                    <?= htmlspecialchars($fila['nombre']) ?>
                                 </td>
 
                                 <td>
-                                    <?= !empty($fila['descripcion']) ? htmlspecialchars($fila['descripcion']) : '-' ?>
+                                    <?= htmlspecialchars($fila['email']) ?>
+                                </td>
+
+                                <td>
+                                    <?= htmlspecialchars($fila['asunto']) ?>
+                                </td>
+
+                                <td style="max-width:350px; text-align:left;">
+                                    <?= nl2br(htmlspecialchars($fila['mensaje'])) ?>
                                 </td>
                             </tr>
 
@@ -141,7 +143,7 @@ body {
         <?php else: ?>
 
             <p class="text-secondary text-center">
-                No hay membresías registradas todavía.
+                No hay mensajes de contacto todavía.
             </p>
 
         <?php endif; ?>

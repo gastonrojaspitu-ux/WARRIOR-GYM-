@@ -1,27 +1,33 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-include("../php/conexion.php");
+include(__DIR__ . "/../php/conexion.php");
 
-if (!isset($_SESSION['id_usuario'])) {
-    header("Location: /warrior_gym/admin/login.php");
+/* PROTEGER SOLO ADMIN */
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+    header("Location: ../login.php");
     exit();
 }
 
-$sql = "SELECT 
-            p.id_personal,
-            p.nombre,
-            p.apellido,
-            p.usuario,
-            p.email,
-            p.estado,
-            c.nombre_cargo
-        FROM personal p
-        INNER JOIN personal_cargo pc
-            ON p.id_personal = pc.id_personal
-        INNER JOIN cargos c
-            ON pc.id_cargo = c.id_cargo
-        ORDER BY p.id_personal";
+/* LISTAR PERSONAL */
+$sql = "
+SELECT 
+    p.id_personal,
+    p.numero_documento,
+    p.nombre,
+    p.apellido,
+    p.telefono,
+    p.email,
+    p.usuario,
+    p.estado,
+    td.descripcion AS tipo_documento
+FROM personal p
+INNER JOIN tipo_documento td 
+    ON p.id_tipo_documento = td.id_tipo_documento
+ORDER BY p.id_personal DESC
+";
 
 $resultado = mysqli_query($conexion, $sql);
 
@@ -35,68 +41,67 @@ if (!$resultado) {
 
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Personal - Warrior Gym</title>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-
-body{
+body {
     font-family: Arial, sans-serif;
-    background:#111;
-    color:white;
-    margin:0;
+    background: #111;
+    color: white;
+    margin: 0;
 }
 
-.header{
-    background:#d40000;
-    padding:20px;
-    text-align:center;
+.header {
+    background: #d40000;
+    padding: 25px;
+    text-align: center;
 }
 
-.contenido{
-    padding:30px;
+.header h1 {
+    margin: 0;
+    font-weight: bold;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:#222;
+.contenido {
+    padding: 30px;
 }
 
-th, td{
-    border:1px solid #444;
-    padding:12px;
-    text-align:center;
+.table-box {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
 }
 
-th{
-    background:#d40000;
+.table-dark th {
+    background: #d40000;
+    color: white;
 }
 
-.boton{
-    background:#d40000;
-    color:white;
-    padding:10px 15px;
-    border-radius:5px;
-    text-decoration:none;
-    display:inline-block;
-    margin-right:10px;
+.btn-warrior {
+    background: #d40000;
+    color: white;
+    border: none;
 }
 
-.boton:hover{
-    background:#ff1a1a;
+.btn-warrior:hover {
+    background: #ff1a1a;
+    color: white;
 }
 
-/* Estado visual */
-.activo{
-    color:lime;
-    font-weight:bold;
+.activo {
+    color: #00ff88;
+    font-weight: bold;
 }
 
-.inactivo{
-    color:red;
-    font-weight:bold;
+.inactivo {
+    color: #ff4d4d;
+    font-weight: bold;
 }
-
 </style>
 
 </head>
@@ -109,60 +114,111 @@ th{
 
 <div class="contenido">
 
-    <!-- BOTONES -->
-    <p>
-        <a class="boton" href="dashboard.php">⬅ Volver al Panel</a>
-        <a class="boton" href="nuevo_personal.php">➕ Nuevo Personal</a>
-    </p>
+    <div class="mb-4">
+        <a href="dashboard.php" class="btn btn-outline-light">
+            ⬅ Volver al Panel
+        </a>
 
-    <table>
+        <a href="nuevo_personal.php" class="btn btn-warrior">
+            ➕ Nuevo Personal
+        </a>
+    </div>
 
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Usuario</th>
-            <th>Email</th>
-            <th>Cargo</th>
-            <th>Estado</th>
-        </tr>
+    <div class="table-box">
 
-        <?php while($fila = mysqli_fetch_assoc($resultado)) { ?>
+        <h3 class="text-danger mb-4">Listado de Personal</h3>
 
-        <tr>
-            <td><?php echo $fila['id_personal']; ?></td>
-            <td><?php echo $fila['nombre']; ?></td>
-            <td><?php echo $fila['apellido']; ?></td>
-            <td><?php echo $fila['usuario']; ?></td>
-            <td><?php echo $fila['email']; ?></td>
-            <td><?php echo $fila['nombre_cargo']; ?></td>
+        <?php if (mysqli_num_rows($resultado) > 0): ?>
 
-            <!-- ESTADO MEJORADO -->
-            <td>
-                <?php if($fila['estado'] == 'Activo') { ?>
-                    <span class="activo">● Activo</span>
-                <?php } else { ?>
-                    <span class="inactivo">● Inactivo</span>
-                <?php } ?>
-            </td>
-        </tr>
-<td>
-    <a class="boton" href="editar_personal.php?id=<?php echo $fila['id_personal']; ?>">
-        Editar
-    </a>
-</td>
-<td>
-    <a class="boton" 
-       href="eliminar_personal.php?id=<?php echo $fila['id_personal']; ?>"
-       onclick="return confirm('¿Seguro que quieres eliminar este personal?');">
-        Eliminar
-    </a>
-</td>
-        <?php } ?>
+            <div class="table-responsive">
 
-    </table>
+                <table class="table table-dark table-hover text-center align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Documento</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Usuario</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
+
+                            <tr>
+                                <td><?= $fila['id_personal'] ?></td>
+
+                                <td>
+                                    <?= htmlspecialchars($fila['tipo_documento']) ?>
+                                    <?= htmlspecialchars($fila['numero_documento']) ?>
+                                </td>
+
+                                <td><?= htmlspecialchars($fila['nombre']) ?></td>
+
+                                <td><?= htmlspecialchars($fila['apellido']) ?></td>
+
+                                <td>
+                                    <?= !empty($fila['telefono']) ? htmlspecialchars($fila['telefono']) : '-' ?>
+                                </td>
+
+                                <td>
+                                    <?= !empty($fila['email']) ? htmlspecialchars($fila['email']) : '-' ?>
+                                </td>
+
+                                <td><?= htmlspecialchars($fila['usuario']) ?></td>
+
+                                <td>
+                                    <?php if($fila['estado'] == 'Activo'): ?>
+                                        <span class="activo">● Activo</span>
+                                    <?php else: ?>
+                                        <span class="inactivo">● Inactivo</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <a 
+                                        href="editar_personal.php?id=<?= $fila['id_personal'] ?>" 
+                                        class="btn btn-warning btn-sm">
+                                        Editar
+                                    </a>
+
+                                    <a 
+                                        href="eliminar_personal.php?id=<?= $fila['id_personal'] ?>" 
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('¿Seguro que querés eliminar este personal?');">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+
+                        <?php endwhile; ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        <?php else: ?>
+
+            <p class="text-secondary text-center">
+                No hay personal registrado todavía.
+            </p>
+
+        <?php endif; ?>
+
+    </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

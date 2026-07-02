@@ -1,81 +1,98 @@
 <?php
 session_start();
-include("../php/conexion.php");
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if (!isset($_SESSION['id_usuario'])) {
-    header("Location: /warrior_gym/admin/login.php");
+include(__DIR__ . "/../php/conexion.php");
+
+/* PROTEGER SOLO ADMIN */
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+    header("Location: ../login.php");
     exit();
 }
 
-$sql = "SELECT * FROM productos";
+/* LISTAR PRODUCTOS */
+$sql = "SELECT * FROM productos ORDER BY id_producto DESC";
 $resultado = mysqli_query($conexion, $sql);
+
+if (!$resultado) {
+    die("Error SQL: " . mysqli_error($conexion));
+}
+
+function formatoPrecio($precio) {
+    return "$" . number_format($precio, 2, ",", ".");
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Productos - Warrior Gym</title>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-body{
-    font-family: Arial;
-    background:#111;
-    color:white;
-    margin:0;
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    margin: 0;
 }
 
-.header{
-    background:#d40000;
-    padding:20px;
-    text-align:center;
+.header {
+    background: #d40000;
+    padding: 25px;
+    text-align: center;
 }
 
-.container{
-    padding:20px;
+.header h1 {
+    margin: 0;
+    font-weight: bold;
 }
 
-a{
-    color:white;
-    text-decoration:none;
+.contenido {
+    padding: 30px;
 }
 
-.btn{
-    background:#d40000;
-    padding:10px 15px;
-    border-radius:5px;
-    display:inline-block;
-    margin-bottom:15px;
+.table-box {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:#222;
+.table-dark th {
+    background: #d40000;
+    color: white;
 }
 
-th, td{
-    padding:12px;
-    border:1px solid #444;
-    text-align:center;
+.btn-warrior {
+    background: #d40000;
+    color: white;
+    border: none;
 }
 
-th{
-    background:#d40000;
+.btn-warrior:hover {
+    background: #ff1a1a;
+    color: white;
 }
 
-.actions a{
-    padding:5px 10px;
-    border-radius:4px;
-    margin:0 3px;
+.stock-ok {
+    color: #00ff88;
+    font-weight: bold;
 }
 
-.edit{
-    background:#f0ad4e;
+.stock-bajo {
+    color: #ffcc00;
+    font-weight: bold;
 }
 
-.delete{
-    background:#d9534f;
+.stock-cero {
+    color: #ff4d4d;
+    font-weight: bold;
 }
 </style>
 
@@ -84,59 +101,120 @@ th{
 <body>
 
 <div class="header">
-    <h1>PRODUCTOS - WARRIOR GYM</h1>
+    <h1>📦 PRODUCTOS - WARRIOR GYM</h1>
 </div>
 
-<div class="container">
+<div class="contenido">
 
-<a class="btn" href="nuevo_producto.php">+ Nuevo Producto</a>
-<a class="btn" href="dashboard.php">⬅ Volver al Panel</a>
-<table>
+    <div class="mb-4">
+        <a href="dashboard.php" class="btn btn-outline-light">
+            ⬅ Volver al Panel
+        </a>
 
-<tr>
-    <th>ID</th>
-    <th>Nombre</th>
-    <th>Descripción</th>
-    <th>Precio</th>
-    <th>Stock</th>
-    <th>Acciones</th>
-</tr>
+        <a href="nuevo_producto.php" class="btn btn-warrior">
+            ➕ Nuevo Producto
+        </a>
+    </div>
 
-<?php while($fila = mysqli_fetch_assoc($resultado)) { ?>
+    <div class="table-box">
 
-<tr>
-    <td><?php echo $fila['id_producto']; ?></td>
-    <td><?php echo $fila['nombre']; ?></td>
-    <td><?php echo $fila['descripcion']; ?></td>
-    <td>$<?php echo $fila['precio']; ?></td>
-    <td><?php echo $fila['stock']; ?></td>
+        <h3 class="text-danger mb-4">Listado de Productos</h3>
 
-    <td class="actions">
-        <a class="edit" href="editar_producto.php?id=<?php echo $fila['id_producto']; ?>">
-Editar
-</a>
-        <a class="delete" href="eliminar_producto.php?id=<?php echo $fila['id_producto']; ?>"
-   onclick="return confirm('¿Seguro que querés eliminar este producto?');">
-Eliminar
-</a>
-<a href="stock.php?id=<?php echo $fila['id_producto']; ?>&accion=sumar"
-   style="background:green;padding:5px;color:white;border-radius:4px;">
-+ 
-</a>
+        <?php if (mysqli_num_rows($resultado) > 0): ?>
 
-<a href="stock.php?id=<?php echo $fila['id_producto']; ?>&accion=restar"
-   style="background:orange;padding:5px;color:white;border-radius:4px;">
-- 
-</a>
+            <div class="table-responsive">
 
-    </td>
-</tr>
+                <table class="table table-dark table-hover text-center align-middle">
 
-<?php } ?>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
 
-</table>
+                    <tbody>
+
+                        <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
+
+                            <tr>
+                                <td><?= $fila['id_producto'] ?></td>
+
+                                <td>
+                                    <?= htmlspecialchars($fila['nombre']) ?>
+                                </td>
+
+                                <td>
+                                    <?= !empty($fila['descripcion']) ? htmlspecialchars($fila['descripcion']) : '-' ?>
+                                </td>
+
+                                <td>
+                                    <?= formatoPrecio($fila['precio']) ?>
+                                </td>
+
+                                <td>
+                                    <?php if ($fila['stock'] <= 0): ?>
+                                        <span class="stock-cero">Sin stock</span>
+                                    <?php elseif ($fila['stock'] <= 5): ?>
+                                        <span class="stock-bajo"><?= $fila['stock'] ?> unidades</span>
+                                    <?php else: ?>
+                                        <span class="stock-ok"><?= $fila['stock'] ?> unidades</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <a 
+                                        href="editar_producto.php?id=<?= $fila['id_producto'] ?>" 
+                                        class="btn btn-warning btn-sm">
+                                        Editar
+                                    </a>
+
+                                    <a 
+                                        href="stock.php?id=<?= $fila['id_producto'] ?>&accion=sumar" 
+                                        class="btn btn-success btn-sm">
+                                        +
+                                    </a>
+
+                                    <a 
+                                        href="stock.php?id=<?= $fila['id_producto'] ?>&accion=restar" 
+                                        class="btn btn-secondary btn-sm">
+                                        -
+                                    </a>
+
+                                    <a 
+                                        href="eliminar_producto.php?id=<?= $fila['id_producto'] ?>" 
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('¿Seguro que querés eliminar este producto? Si ya tiene ventas, conviene no borrarlo.');">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+
+                        <?php endwhile; ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        <?php else: ?>
+
+            <p class="text-secondary text-center">
+                No hay productos registrados todavía.
+            </p>
+
+        <?php endif; ?>
+
+    </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

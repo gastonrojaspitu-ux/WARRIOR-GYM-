@@ -7,13 +7,12 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-$sql = "SELECT rc.*, 
-               c.nombre AS nombre_cliente, c.apellido,
-               r.nombre_rutina
-        FROM rutinas_cliente rc
-        INNER JOIN clientes c ON rc.id_cliente = c.id_cliente
-        INNER JOIN rutinas r ON rc.id_rutina = r.id_rutina
-        ORDER BY rc.id_rutina_cliente DESC";
+$sql = "SELECT ra.*,
+               c.nombre AS nombre_cliente,
+               c.apellido
+        FROM rutina_asignada ra
+        INNER JOIN clientes c ON ra.id_cliente = c.id_cliente
+        ORDER BY ra.id_rutina_asignada DESC";
 
 $resultado = mysqli_query($conexion, $sql);
 ?>
@@ -67,10 +66,11 @@ h2{
 
 <?php while($fila = mysqli_fetch_assoc($resultado)) { ?>
 <tr>
-    <td><?= $fila['nombre_cliente'] . " " . $fila['apellido'] ?></td>
-    <td><?= $fila['nombre_rutina'] ?></td>
-    <td><?= $fila['fecha_inicio'] ?></td>
-    <td><?= $fila['fecha_fin'] ?></td>
+   <td><?= $fila['nombre_cliente'] . " " . $fila['apellido'] ?></td>
+<td><?= $fila['nombre_rutina'] ?></td>
+<td><?= $fila['descripcion'] ?></td>
+<td><?= $fila['fecha_asignacion'] ?></td>
+<td><?= $fila['estado'] ?></td>
 </tr>
 <?php } ?>
 

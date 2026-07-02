@@ -7,26 +7,55 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-/* MES Y AÑO ACTUAL */
-$mes = isset($_GET['mes']) ? $_GET['mes'] : date('m');
-$anio = isset($_GET['anio']) ? $_GET['anio'] : date('Y');
+/* 🔥 CONVERTIR A AM/PM */
+function formatoHora($hora) {
+    return date("h:i A", strtotime($hora));
+}
+
+/* MES / AÑO */
+$mes = isset($_GET['mes']) ? (int)$_GET['mes'] : date('m');
+$anio = isset($_GET['anio']) ? (int)$_GET['anio'] : date('Y');
+
+if ($mes < 1) { $mes = 12; $anio--; }
+if ($mes > 12) { $mes = 1; $anio++; }
 
 $primer_dia = date("N", strtotime("$anio-$mes-01"));
 $dias_mes = date("t", strtotime("$anio-$mes-01"));
 
-/* RESERVAS DEL MES */
+/* RESERVAS ACTIVAS */
 $sql = "SELECT fecha, COUNT(*) as total
         FROM reservas
         WHERE MONTH(fecha) = '$mes'
         AND YEAR(fecha) = '$anio'
+        AND estado_reserva = 'Activa'
         GROUP BY fecha";
 
 $res = mysqli_query($conexion, $sql);
 
 $reservas = [];
-
 while ($row = mysqli_fetch_assoc($res)) {
     $reservas[$row['fecha']] = $row['total'];
+}
+
+/* DETALLE DÍA */
+$detalle = [];
+
+if (isset($_GET['dia'])) {
+
+    $fecha_click = $_GET['dia'];
+
+    $sqlD = "SELECT r.*, c.nombre, c.apellido, a.nombre AS aparato
+             FROM reservas r
+             INNER JOIN clientes c ON r.id_cliente = c.id_cliente
+             INNER JOIN aparatos a ON r.id_aparato = a.id_aparato
+             WHERE r.fecha = '$fecha_click'
+             AND r.estado_reserva = 'Activa'";
+
+    $resD = mysqli_query($conexion, $sqlD);
+
+    while ($row = mysqli_fetch_assoc($resD)) {
+        $detalle[] = $row;
+    }
 }
 ?>
 
@@ -34,92 +63,93 @@ while ($row = mysqli_fetch_assoc($res)) {
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Calendario de Reservas</title>
+<title>Calendario Reservas</title>
 
 <style>
 body{
     font-family: Arial;
     background:#111;
     color:white;
-    text-align:center;
 }
 
-.calendario{
-    width:90%;
+.contenedor{
+    width:95%;
     margin:auto;
+}
+
+h2{
+    text-align:center;
+    color:#ff2e2e;
+}
+
+.boton{
+    display:inline-block;
+    background:#444;
+    color:white;
+    padding:10px 15px;
+    text-decoration:none;
+    border-radius:5px;
+    margin:10px 5px;
+}
+
+.boton:hover{
+    background:#d40000;
 }
 
 table{
     width:100%;
-    border-collapse:collapse;
-    background:#222;
+    border-collapse:separate;
+    border-spacing:5px;
+    text-align:center;
 }
 
-th, td{
-    border:1px solid #444;
-    padding:15px;
-    height:80px;
-}
-
-th{
-    background:#d40000;
+td{
+    height:70px;
+    background:#2a2a2a;
+    border-radius:8px;
+    padding:5px;
+    cursor:pointer;
 }
 
 td:hover{
-    background:#333;
+    background:#3a3a3a;
 }
 
-.reserva{
+.rojo{
     background:#d40000;
-    color:white;
-    border-radius:5px;
-    padding:5px;
-    font-size:12px;
-    display:inline-block;
-    margin-top:5px;
 }
 
-.nav{
-    margin:20px;
-}
-
-.nav a{
-    color:white;
-    text-decoration:none;
-    background:#444;
-    padding:10px 15px;
-    margin:5px;
-    border-radius:5px;
-}
-
-.nav a:hover{
-    background:#d40000;
+.detalle{
+    margin-top:20px;
+    background:#222;
+    padding:15px;
+    border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
+<div class="contenedor">
+
 <h2>📅 Calendario de Reservas</h2>
 
-<div class="nav">
-    <a href="calendario_reservas.php?mes=<?php echo $mes-1; ?>&anio=<?php echo $anio; ?>">⬅ Mes anterior</a>
-    <a href="dashboard.php">🏠 Panel</a>
-    <a href="calendario_reservas.php?mes=<?php echo $mes+1; ?>&anio=<?php echo $anio; ?>">Mes siguiente ➡</a>
+<div style="text-align:center;">
+    <a class="boton" href="nueva_reserva.php">➕ Nueva Reserva</a>
+    <a class="boton" href="dashboard.php">🏠 Panel</a>
 </div>
 
-<div class="calendario">
+<div style="text-align:center;">
+    <a class="boton" href="?mes=<?php echo $mes-1; ?>&anio=<?php echo $anio; ?>">⬅</a>
+
+    <b><?php echo date("F Y", strtotime("$anio-$mes-01")); ?></b>
+
+    <a class="boton" href="?mes=<?php echo $mes+1; ?>&anio=<?php echo $anio; ?>">➡</a>
+</div>
 
 <table>
-
 <tr>
-    <th>Lun</th>
-    <th>Mar</th>
-    <th>Mié</th>
-    <th>Jue</th>
-    <th>Vie</th>
-    <th>Sáb</th>
-    <th>Dom</th>
+<th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
 </tr>
 
 <tr>
@@ -128,23 +158,23 @@ td:hover{
 $dia = 1;
 $col = 1;
 
-/* ESPACIOS INICIALES */
 for ($i = 1; $i < $primer_dia; $i++) {
     echo "<td></td>";
     $col++;
 }
 
-/* DÍAS */
 while ($dia <= $dias_mes) {
 
     $fecha = sprintf("%04d-%02d-%02d", $anio, $mes, $dia);
 
-    echo "<td>";
+    $clase = isset($reservas[$fecha]) ? "rojo" : "";
+
+    echo "<td class='$clase' onclick=\"window.location='?mes=$mes&anio=$anio&dia=$fecha'\">";
 
     echo "<b>$dia</b><br>";
 
     if (isset($reservas[$fecha])) {
-        echo "<div class='reserva'>".$reservas[$fecha]." reservas</div>";
+        echo "<small>{$reservas[$fecha]} reservas</small>";
     }
 
     echo "</td>";
@@ -157,7 +187,6 @@ while ($dia <= $dias_mes) {
     $col++;
 }
 
-/* COMPLETAR FILA */
 while ($col % 7 != 1) {
     echo "<td></td>";
     $col++;
@@ -165,8 +194,31 @@ while ($col % 7 != 1) {
 ?>
 
 </tr>
-
 </table>
+
+<?php if (isset($_GET['dia'])) { ?>
+
+<div class="detalle">
+
+<h3>📌 Reservas del día: <?php echo $_GET['dia']; ?></h3>
+
+<?php if (count($detalle) == 0) { ?>
+    <p>No hay reservas activas.</p>
+<?php } ?>
+
+<?php foreach($detalle as $r) { ?>
+
+<div style="background:#333;padding:10px;margin:5px;border-radius:8px;">
+    👤 <?php echo $r['nombre']." ".$r['apellido']; ?> |
+    🏋 <?php echo $r['aparato']; ?> |
+    ⏰ <?php echo formatoHora($r['hora_inicio'])." - ".formatoHora($r['hora_fin']); ?>
+</div>
+
+<?php } ?>
+
+</div>
+
+<?php } ?>
 
 </div>
 

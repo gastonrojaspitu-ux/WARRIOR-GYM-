@@ -1,43 +1,90 @@
 <?php
 session_start();
-include("../php/conexion.php");
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if (!isset($_SESSION['id_usuario'])) {
-    header("Location: /warrior_gym/admin/login.php");
+include(__DIR__ . "/../php/conexion.php");
+
+/* PROTEGER SOLO ADMIN */
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+    header("Location: ../login.php");
     exit();
 }
 
-// TRAER PRODUCTO
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+$error = "";
 
-    $sql = "SELECT * FROM productos WHERE id_producto = $id";
-    $resultado = mysqli_query($conexion, $sql);
-    $producto = mysqli_fetch_assoc($resultado);
+/* VALIDAR ID */
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header("Location: productos.php");
+    exit();
 }
 
-// GUARDAR CAMBIOS
+$id_producto = intval($_GET['id']);
+
+/* TRAER PRODUCTO */
+$sqlProducto = "SELECT * FROM productos WHERE id_producto = ? LIMIT 1";
+$stmtProducto = mysqli_prepare($conexion, $sqlProducto);
+mysqli_stmt_bind_param($stmtProducto, "i", $id_producto);
+mysqli_stmt_execute($stmtProducto);
+$resProducto = mysqli_stmt_get_result($stmtProducto);
+
+if (!$resProducto || mysqli_num_rows($resProducto) == 0) {
+    echo "<script>
+        alert('Producto no encontrado.');
+        window.location='productos.php';
+    </script>";
+    exit();
+}
+
+$producto = mysqli_fetch_assoc($resProducto);
+
+/* GUARDAR CAMBIOS */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $id = $_POST['id'];
-    $nombre = $_POST['nombre'];
-    $descripcion = $_POST['descripcion'];
-    $precio = $_POST['precio'];
-    $stock = $_POST['stock'];
+    $nombre = trim($_POST['nombre']);
+    $descripcion = trim($_POST['descripcion']);
+    $precio = floatval($_POST['precio']);
+    $stock = intval($_POST['stock']);
 
-    $sql = "UPDATE productos SET 
-            nombre = '$nombre',
-            descripcion = '$descripcion',
-            precio = '$precio',
-            stock = '$stock'
-            WHERE id_producto = $id";
+    if (empty($nombre) || $precio <= 0 || $stock < 0) {
 
-    if (mysqli_query($conexion, $sql)) {
-        header("Location: productos.php");
-        exit();
+        $error = "Completá correctamente nombre, precio y stock.";
+
     } else {
-        echo "Error al actualizar: " . mysqli_error($conexion);
+
+        $sqlUpdate = "UPDATE productos SET 
+                        nombre = ?,
+                        descripcion = ?,
+                        precio = ?,
+                        stock = ?
+                      WHERE id_producto = ?";
+
+        $stmtUpdate = mysqli_prepare($conexion, $sqlUpdate);
+
+        mysqli_stmt_bind_param(
+            $stmtUpdate,
+            "ssdii",
+            $nombre,
+            $descripcion,
+            $precio,
+            $stock,
+            $id_producto
+        );
+
+        if (mysqli_stmt_execute($stmtUpdate)) {
+            echo "<script>
+                alert('Producto actualizado correctamente.');
+                window.location='productos.php';
+            </script>";
+            exit();
+        } else {
+            $error = "Error al actualizar producto: " . mysqli_error($conexion);
+        }
     }
+}
+
+function valor($dato) {
+    return htmlspecialchars($dato ?? '');
 }
 ?>
 
@@ -45,33 +92,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Editar Producto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Editar Producto - Warrior Gym</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{
-    background:#111;
-    color:white;
-    font-family:Arial;
+body {
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
 }
 
-.container{
-    width:500px;
-    margin:40px auto;
+.header {
+    background: #d40000;
+    padding: 25px;
+    text-align: center;
 }
 
-input, textarea{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
+.header h1 {
+    margin: 0;
+    font-weight: bold;
 }
 
-button{
-    width:100%;
-    padding:12px;
-    background:#f0ad4e;
-    color:black;
-    border:none;
-    cursor:pointer;
+.form-box {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #1c1c1c;
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    box-shadow: 0 0 20px rgba(220,53,69,0.20);
+}
+
+.form-control {
+    background: #111;
+    color: white;
+    border: 1px solid #333;
+}
+
+.form-control:focus {
+    background: #111;
+    color: white;
+    border-color: #dc3545;
+    box-shadow: none;
+}
+
+.btn-warrior {
+    background: #d40000;
+    color: white;
+    border: none;
+}
+
+.btn-warrior:hover {
+    background: #ff1a1a;
+    color: white;
 }
 </style>
 
@@ -79,27 +155,70 @@ button{
 
 <body>
 
+<div class="header">
+    <h1>✏️ Editar Producto</h1>
+</div>
+
 <div class="container">
 
-<h1 align="center">Editar Producto</h1>
+    <div class="form-box">
 
-<form method="POST">
+        <div class="mb-3">
+            <a href="productos.php" class="btn btn-outline-light btn-sm">
+                ⬅ Volver a Productos
+            </a>
+        </div>
 
-    <input type="hidden" name="id" value="<?php echo $producto['id_producto']; ?>">
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger text-center">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
 
-    <input type="text" name="nombre" value="<?php echo $producto['nombre']; ?>" required>
+        <form method="POST">
 
-    <textarea name="descripcion"><?php echo $producto['descripcion']; ?></textarea>
+            <label class="mb-1">Nombre del producto</label>
+            <input 
+                type="text" 
+                name="nombre" 
+                class="form-control mb-3" 
+                value="<?= valor($producto['nombre']) ?>"
+                required>
 
-    <input type="number" step="0.01" name="precio" value="<?php echo $producto['precio']; ?>" required>
+            <label class="mb-1">Descripción</label>
+            <textarea 
+                name="descripcion" 
+                class="form-control mb-3" 
+                rows="4"><?= valor($producto['descripcion']) ?></textarea>
 
-    <input type="number" name="stock" value="<?php echo $producto['stock']; ?>" required>
+            <label class="mb-1">Precio</label>
+            <input 
+                type="number" 
+                step="0.01" 
+                name="precio" 
+                class="form-control mb-3" 
+                value="<?= valor($producto['precio']) ?>"
+                required>
 
-    <button type="submit">Guardar Cambios</button>
+            <label class="mb-1">Stock</label>
+            <input 
+                type="number" 
+                name="stock" 
+                class="form-control mb-3" 
+                value="<?= valor($producto['stock']) ?>"
+                required>
 
-</form>
+            <button type="submit" class="btn btn-warrior w-100">
+                Guardar Cambios
+            </button>
+
+        </form>
+
+    </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
