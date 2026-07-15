@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include(__DIR__ . "/../php/conexion.php");
+date_default_timezone_set("America/Argentina/Buenos_Aires");
 
 /* PROTEGER SOLO ADMIN */
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
@@ -12,6 +13,13 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['ro
 }
 
 $error = "";
+
+$id_cliente = "";
+$id_aparato = "";
+$fecha = date("Y-m-d");
+$hora_inicio = "";
+$hora_fin = "";
+$estado_reserva = "Activa";
 
 /* CARGAR CLIENTES */
 $sqlClientes = "
@@ -43,16 +51,24 @@ if (!$aparatos) {
 /* GUARDAR RESERVA */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $id_cliente = intval($_POST['id_cliente']);
-    $id_aparato = intval($_POST['id_aparato']);
-    $fecha = trim($_POST['fecha']);
-    $hora_inicio = trim($_POST['hora_inicio']);
-    $hora_fin = trim($_POST['hora_fin']);
-    $estado_reserva = trim($_POST['estado_reserva']);
+    $id_cliente = intval($_POST['id_cliente'] ?? 0);
+    $id_aparato = intval($_POST['id_aparato'] ?? 0);
+    $fecha = trim($_POST['fecha'] ?? "");
+    $hora_inicio = trim($_POST['hora_inicio'] ?? "");
+    $hora_fin = trim($_POST['hora_fin'] ?? "");
+    $estado_reserva = trim($_POST['estado_reserva'] ?? "");
 
     if ($id_cliente <= 0 || $id_aparato <= 0 || empty($fecha) || empty($hora_inicio) || empty($hora_fin) || empty($estado_reserva)) {
 
         $error = "Completá todos los campos.";
+
+    } elseif ($fecha < date("Y-m-d")) {
+
+        $error = "No se puede crear una reserva con fecha pasada.";
+
+    } elseif ($fecha == date("Y-m-d") && $hora_inicio <= date("H:i")) {
+
+        $error = "No se puede crear una reserva con un horario que ya pasó.";
 
     } elseif ($hora_inicio >= $hora_fin) {
 
@@ -254,9 +270,9 @@ body {
                 <option value="">Seleccionar cliente</option>
 
                 <?php while($c = mysqli_fetch_assoc($clientes)): ?>
-                    <option value="<?= $c['id_cliente'] ?>">
-                        <?= htmlspecialchars($c['apellido'] . " " . $c['nombre']) ?>
-                    </option>
+                    <option value="<?= $c['id_cliente'] ?>" <?= ($id_cliente == $c['id_cliente']) ? "selected" : "" ?>>
+    <?= htmlspecialchars($c['apellido'] . " " . $c['nombre']) ?>
+</option>
                 <?php endwhile; ?>
             </select>
 
@@ -265,69 +281,70 @@ body {
                 <option value="">Seleccionar aparato</option>
 
                 <?php while($a = mysqli_fetch_assoc($aparatos)): ?>
-                    <option value="<?= $a['id_aparato'] ?>">
-                        <?= htmlspecialchars($a['nombre']) ?>
-                    </option>
+                   <option value="<?= $a['id_aparato'] ?>" <?= ($id_aparato == $a['id_aparato']) ? "selected" : "" ?>>
+    <?= htmlspecialchars($a['nombre']) ?>
+</option>
                 <?php endwhile; ?>
             </select>
 
             <label class="mb-1">Fecha</label>
             <input 
-                type="date" 
-                name="fecha" 
-                class="form-control mb-3"
-                value="<?= date('Y-m-d') ?>"
-                required>
+    type="date" 
+    name="fecha" 
+    class="form-control mb-3"
+    min="<?= date('Y-m-d') ?>"
+    value="<?= htmlspecialchars($fecha) ?>"
+    required>
 
-            <label class="mb-1">Hora inicio</label>
-            <select name="hora_inicio" class="form-select mb-3" required>
-                <option value="">Seleccionar hora</option>
-                <option value="06:00">06:00 AM</option>
-                <option value="07:00">07:00 AM</option>
-                <option value="08:00">08:00 AM</option>
-                <option value="09:00">09:00 AM</option>
-                <option value="10:00">10:00 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="12:00">12:00 PM</option>
-                <option value="13:00">01:00 PM</option>
-                <option value="14:00">02:00 PM</option>
-                <option value="15:00">03:00 PM</option>
-                <option value="16:00">04:00 PM</option>
-                <option value="17:00">05:00 PM</option>
-                <option value="18:00">06:00 PM</option>
-                <option value="19:00">07:00 PM</option>
-                <option value="20:00">08:00 PM</option>
-                <option value="21:00">09:00 PM</option>
-                <option value="22:00">10:00 PM</option>
-            </select>
+           <label class="mb-1">Hora inicio</label>
+<select name="hora_inicio" class="form-select mb-3" required>
+    <option value="">Seleccionar hora</option>
+    <option value="06:00" <?= ($hora_inicio == "06:00") ? "selected" : "" ?>>06:00 AM</option>
+    <option value="07:00" <?= ($hora_inicio == "07:00") ? "selected" : "" ?>>07:00 AM</option>
+    <option value="08:00" <?= ($hora_inicio == "08:00") ? "selected" : "" ?>>08:00 AM</option>
+    <option value="09:00" <?= ($hora_inicio == "09:00") ? "selected" : "" ?>>09:00 AM</option>
+    <option value="10:00" <?= ($hora_inicio == "10:00") ? "selected" : "" ?>>10:00 AM</option>
+    <option value="11:00" <?= ($hora_inicio == "11:00") ? "selected" : "" ?>>11:00 AM</option>
+    <option value="12:00" <?= ($hora_inicio == "12:00") ? "selected" : "" ?>>12:00 PM</option>
+    <option value="13:00" <?= ($hora_inicio == "13:00") ? "selected" : "" ?>>01:00 PM</option>
+    <option value="14:00" <?= ($hora_inicio == "14:00") ? "selected" : "" ?>>02:00 PM</option>
+    <option value="15:00" <?= ($hora_inicio == "15:00") ? "selected" : "" ?>>03:00 PM</option>
+    <option value="16:00" <?= ($hora_inicio == "16:00") ? "selected" : "" ?>>04:00 PM</option>
+    <option value="17:00" <?= ($hora_inicio == "17:00") ? "selected" : "" ?>>05:00 PM</option>
+    <option value="18:00" <?= ($hora_inicio == "18:00") ? "selected" : "" ?>>06:00 PM</option>
+    <option value="19:00" <?= ($hora_inicio == "19:00") ? "selected" : "" ?>>07:00 PM</option>
+    <option value="20:00" <?= ($hora_inicio == "20:00") ? "selected" : "" ?>>08:00 PM</option>
+    <option value="21:00" <?= ($hora_inicio == "21:00") ? "selected" : "" ?>>09:00 PM</option>
+    <option value="22:00" <?= ($hora_inicio == "22:00") ? "selected" : "" ?>>10:00 PM</option>
+</select>
 
-            <label class="mb-1">Hora fin</label>
-            <select name="hora_fin" class="form-select mb-3" required>
-                <option value="">Seleccionar hora</option>
-                <option value="07:00">07:00 AM</option>
-                <option value="08:00">08:00 AM</option>
-                <option value="09:00">09:00 AM</option>
-                <option value="10:00">10:00 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="12:00">12:00 PM</option>
-                <option value="13:00">01:00 PM</option>
-                <option value="14:00">02:00 PM</option>
-                <option value="15:00">03:00 PM</option>
-                <option value="16:00">04:00 PM</option>
-                <option value="17:00">05:00 PM</option>
-                <option value="18:00">06:00 PM</option>
-                <option value="19:00">07:00 PM</option>
-                <option value="20:00">08:00 PM</option>
-                <option value="21:00">09:00 PM</option>
-                <option value="22:00">10:00 PM</option>
-                <option value="23:00">11:00 PM</option>
-            </select>
+          <label class="mb-1">Hora fin</label>
+<select name="hora_fin" class="form-select mb-3" required>
+    <option value="">Seleccionar hora</option>
+    <option value="07:00" <?= ($hora_fin == "07:00") ? "selected" : "" ?>>07:00 AM</option>
+    <option value="08:00" <?= ($hora_fin == "08:00") ? "selected" : "" ?>>08:00 AM</option>
+    <option value="09:00" <?= ($hora_fin == "09:00") ? "selected" : "" ?>>09:00 AM</option>
+    <option value="10:00" <?= ($hora_fin == "10:00") ? "selected" : "" ?>>10:00 AM</option>
+    <option value="11:00" <?= ($hora_fin == "11:00") ? "selected" : "" ?>>11:00 AM</option>
+    <option value="12:00" <?= ($hora_fin == "12:00") ? "selected" : "" ?>>12:00 PM</option>
+    <option value="13:00" <?= ($hora_fin == "13:00") ? "selected" : "" ?>>01:00 PM</option>
+    <option value="14:00" <?= ($hora_fin == "14:00") ? "selected" : "" ?>>02:00 PM</option>
+    <option value="15:00" <?= ($hora_fin == "15:00") ? "selected" : "" ?>>03:00 PM</option>
+    <option value="16:00" <?= ($hora_fin == "16:00") ? "selected" : "" ?>>04:00 PM</option>
+    <option value="17:00" <?= ($hora_fin == "17:00") ? "selected" : "" ?>>05:00 PM</option>
+    <option value="18:00" <?= ($hora_fin == "18:00") ? "selected" : "" ?>>06:00 PM</option>
+    <option value="19:00" <?= ($hora_fin == "19:00") ? "selected" : "" ?>>07:00 PM</option>
+    <option value="20:00" <?= ($hora_fin == "20:00") ? "selected" : "" ?>>08:00 PM</option>
+    <option value="21:00" <?= ($hora_fin == "21:00") ? "selected" : "" ?>>09:00 PM</option>
+    <option value="22:00" <?= ($hora_fin == "22:00") ? "selected" : "" ?>>10:00 PM</option>
+    <option value="23:00" <?= ($hora_fin == "23:00") ? "selected" : "" ?>>11:00 PM</option>
+</select>
 
             <label class="mb-1">Estado</label>
             <select name="estado_reserva" class="form-select mb-3" required>
-                <option value="Activa">Activa</option>
-                <option value="Cancelada">Cancelada</option>
-                <option value="Finalizada">Finalizada</option>
+                <option value="Activa" <?= ($estado_reserva == "Activa") ? "selected" : "" ?>>Activa</option>
+<option value="Cancelada" <?= ($estado_reserva == "Cancelada") ? "selected" : "" ?>>Cancelada</option>
+<option value="Finalizada" <?= ($estado_reserva == "Finalizada") ? "selected" : "" ?>>Finalizada</option>
             </select>
 
             <button type="submit" class="btn btn-warrior w-100">

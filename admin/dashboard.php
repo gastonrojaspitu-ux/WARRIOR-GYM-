@@ -202,6 +202,14 @@ a:hover {
     <div class="tarjeta">
         📩 Mensajes de Contacto
     </div>
+
+    <!-- SISTEMA -->
+  <h2 class="seccion">🗄 Sistema</h2>
+
+   <a href="base_datos.php">
+    <div class="tarjeta">
+        🗄 Base de Datos / Tablas del Sistema
+    </div>
 </a>
 
 </div>

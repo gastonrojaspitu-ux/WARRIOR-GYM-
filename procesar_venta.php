@@ -19,6 +19,31 @@ $data = json_decode(file_get_contents("php://input"), true);
 if (!$data || empty($data['items'])) {
     die("ERROR: carrito vacío");
 }
+/* VALIDAR DATOS DE PAGO SIMULADO */
+if (
+    !isset($data['pago']) ||
+    !isset($data['pago']['metodo']) ||
+    !isset($data['pago']['titular']) ||
+    !isset($data['pago']['ultimos_digitos'])
+) {
+    die("ERROR: faltan datos de pago");
+}
+
+$metodo_pago = trim($data['pago']['metodo']);
+$titular_pago = trim($data['pago']['titular']);
+$ultimos_digitos = trim($data['pago']['ultimos_digitos']);
+
+if ($metodo_pago != "Tarjeta") {
+    die("ERROR: método de pago inválido");
+}
+
+if (!preg_match("/^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$/u", $titular_pago)) {
+    die("ERROR: titular de tarjeta inválido");
+}
+
+if (!preg_match("/^[0-9]{4}$/", $ultimos_digitos)) {
+    die("ERROR: datos de tarjeta inválidos");
+}
 
 mysqli_begin_transaction($conexion);
 

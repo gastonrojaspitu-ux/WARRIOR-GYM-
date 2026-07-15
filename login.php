@@ -6,70 +6,130 @@ $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $usuario = trim($_POST['usuario']);
-    $contrasena = $_POST['contrasena'];
+    $usuario = trim($_POST['usuario'] ?? "");
+    $contrasena = $_POST['contrasena'] ?? "";
 
-    $sql = "SELECT 
-                u.id_usuario,
-                u.nombre,
-                u.email,
-                u.password,
-                u.rol,
-                u.estado,
-                c.id_cliente
-            FROM usuarios u
-            LEFT JOIN clientes c ON u.id_usuario = c.id_usuario
-            WHERE (u.nombre = ? OR u.email = ?)
-            AND u.estado = 'Activo'
-            LIMIT 1";
+    if ($usuario == "" || $contrasena == "") {
 
-    $stmt = mysqli_prepare($conexion, $sql);
-    mysqli_stmt_bind_param($stmt, "ss", $usuario, $usuario);
-    mysqli_stmt_execute($stmt);
+        $error = "Completá usuario y contraseña.";
 
-    $resultado = mysqli_stmt_get_result($stmt);
+    } else {
 
-    if ($row = mysqli_fetch_assoc($resultado)) {
+        /*
+            1) PRIMERO BUSCA EN usuarios:
+            admin y cliente siguen funcionando igual.
+        */
+        $sql = "SELECT 
+                    u.id_usuario,
+                    u.nombre,
+                    u.email,
+                    u.password,
+                    u.rol,
+                    u.estado,
+                    c.id_cliente
+                FROM usuarios u
+                LEFT JOIN clientes c ON u.id_usuario = c.id_usuario
+                WHERE (u.nombre = ? OR u.email = ?)
+                AND u.estado = 'Activo'
+                LIMIT 1";
 
-        $password_bd = $row['password'];
+        $stmt = mysqli_prepare($conexion, $sql);
+        mysqli_stmt_bind_param($stmt, "ss", $usuario, $usuario);
+        mysqli_stmt_execute($stmt);
 
-        $password_ok = password_verify($contrasena, $password_bd) || $contrasena === $password_bd;
+        $resultado = mysqli_stmt_get_result($stmt);
 
-        if ($password_ok) {
+        if ($row = mysqli_fetch_assoc($resultado)) {
 
-            if ($row['rol'] == 'cliente' && empty($row['id_cliente'])) {
-                $error = "Tu cuenta no está vinculada a un cliente. Consultá al administrador.";
+            $password_bd = $row['password'];
+            $password_ok = password_verify($contrasena, $password_bd) || $contrasena === $password_bd;
+
+            if ($password_ok) {
+
+                if ($row['rol'] == 'cliente' && empty($row['id_cliente'])) {
+
+                    $error = "Tu cuenta no está vinculada a un cliente. Consultá al administrador.";
+
+                } else {
+
+                    $_SESSION['id_usuario'] = $row['id_usuario'];
+                    $_SESSION['nombre'] = $row['nombre'];
+                    $_SESSION['email'] = $row['email'];
+                    $_SESSION['rol'] = $row['rol'];
+                    $_SESSION['id_cliente'] = $row['id_cliente'];
+
+                    if ($row['rol'] == 'admin') {
+                        header("Location: admin/dashboard.php");
+                        exit();
+                    }
+
+                    if ($row['rol'] == 'cliente') {
+                        header("Location: dashboard_usuario.php");
+                        exit();
+                    }
+
+                    $error = "Rol de usuario no válido.";
+                }
+
             } else {
 
-                $_SESSION['id_usuario'] = $row['id_usuario'];
-                $_SESSION['nombre'] = $row['nombre'];
-                $_SESSION['email'] = $row['email'];
-                $_SESSION['rol'] = $row['rol'];
-                $_SESSION['id_cliente'] = $row['id_cliente'];
-
-                if ($row['rol'] == 'admin') {
-                    header("Location: admin/dashboard.php");
-                    exit();
-                }
-
-                if ($row['rol'] == 'cliente') {
-                    header("Location: dashboard_usuario.php");
-                    exit();
-                }
-
-                $error = "Rol de usuario no válido.";
+                $error = "Usuario o contraseña incorrectos.";
             }
 
         } else {
-            $error = "Usuario o contraseña incorrectos.";
-        }
 
-    } else {
-        $error = "Usuario o contraseña incorrectos.";
+            /*
+                2) SI NO EXISTE EN usuarios,
+                BUSCA EN personal:
+                entrenador / personal.
+            */
+            $sqlPersonal = "SELECT 
+                                id_personal,
+                                nombre,
+                                apellido,
+                                email,
+                                usuario,
+                                contrasena,
+                                estado
+                            FROM personal
+                            WHERE usuario = ?
+                            AND estado = 'Activo'
+                            LIMIT 1";
+
+            $stmtPersonal = mysqli_prepare($conexion, $sqlPersonal);
+            mysqli_stmt_bind_param($stmtPersonal, "s", $usuario);
+            mysqli_stmt_execute($stmtPersonal);
+
+            $resPersonal = mysqli_stmt_get_result($stmtPersonal);
+
+            if ($personal = mysqli_fetch_assoc($resPersonal)) {
+
+                $password_personal = $personal['contrasena'];
+                $password_ok_personal = password_verify($contrasena, $password_personal) || $contrasena === $password_personal;
+
+                if ($password_ok_personal) {
+
+                    $_SESSION['id_personal'] = $personal['id_personal'];
+                    $_SESSION['nombre'] = $personal['nombre'] . " " . $personal['apellido'];
+                    $_SESSION['email'] = $personal['email'];
+                    $_SESSION['rol'] = 'entrenador';
+
+                    header("Location: dashboard_entrenador.php");
+                    exit();
+
+                } else {
+
+                    $error = "Usuario o contraseña incorrectos.";
+                }
+
+            } else {
+
+                $error = "Usuario o contraseña incorrectos.";
+            }
+        }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>

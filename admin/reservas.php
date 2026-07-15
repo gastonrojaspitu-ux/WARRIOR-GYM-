@@ -99,7 +99,7 @@ if (isset($_GET['dia']) && !empty($_GET['dia'])) {
 }
 
 function formatoHora($hora) {
-    return date("H:i", strtotime($hora));
+    return date("h:i A", strtotime($hora));
 }
 
 function formatoFecha($fecha) {

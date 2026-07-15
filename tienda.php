@@ -4,15 +4,15 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include(__DIR__ . "/php/conexion.php");
+$cliente_logueado = false;
 
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_cliente'])) {
-    header("Location: login.php");
-    exit();
-}
-
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'cliente') {
-    header("Location: login.php");
-    exit();
+if (
+    isset($_SESSION['id_usuario']) &&
+    isset($_SESSION['id_cliente']) &&
+    isset($_SESSION['rol']) &&
+    $_SESSION['rol'] == 'cliente'
+) {
+    $cliente_logueado = true;
 }
 
 $sql = "SELECT * FROM productos ORDER BY id_producto";
@@ -179,19 +179,32 @@ body {
 <body>
 
 <nav class="navbar navbar-dark navbar-expand-lg">
-    <div class="container">
+<div class="container">
 
-        <a class="navbar-brand fw-bold" href="dashboard_usuario.php">
-            🏋️ Warrior Gym
-        </a>
+    <a class="navbar-brand fw-bold" href="index.html">
+        🏋️ Warrior Gym
+    </a>
 
-        <div class="navbar-nav ms-auto">
+    <div class="navbar-nav ms-auto">
+
+        <a class="nav-link text-white" href="index.html">Inicio</a>
+
+        <?php if ($cliente_logueado): ?>
+
             <a class="nav-link text-white" href="dashboard_usuario.php">Panel</a>
             <a class="nav-link text-white" href="clientes_mis_compras.php">Mis compras</a>
-            <a class="nav-link text-white" href="/warrior_gym/logout.php">Cerrar sesión</a>
-        </div>
+            <a class="nav-link text-white" href="logout.php">Cerrar sesión</a>
+
+        <?php else: ?>
+
+            <a class="nav-link text-white" href="login.php">Iniciar sesión</a>
+            <a class="nav-link text-white" href="register.php">Registrarse</a>
+
+        <?php endif; ?>
 
     </div>
+
+</div>
 </nav>
 
 <section class="hero">
@@ -260,10 +273,66 @@ body {
     </div>
 
 </div>
+<!-- MODAL PAGO CON TARJETA -->
+<div class="modal fade" id="modalTarjeta" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white border border-danger">
 
+            <div class="modal-header border-danger">
+                <h5 class="modal-title text-danger">
+                    <i class="bi bi-credit-card"></i> Datos de pago
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label class="form-label">Titular de la tarjeta</label>
+                    <input type="text" id="titularTarjeta" class="form-control" placeholder="Ej: Gastón Rojas">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Número de tarjeta</label>
+                    <input type="text" id="numeroTarjeta" class="form-control" maxlength="16" placeholder="Solo números">
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Vencimiento</label>
+                        <input type="month" id="vencimientoTarjeta" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CVV</label>
+                        <input type="text" id="cvvTarjeta" class="form-control" maxlength="4" placeholder="123">
+                    </div>
+
+                </div>
+
+                <p class="text-secondary small mb-0">
+                    Pago simulado para fines académicos. No se realiza un cobro real.
+                </p>
+
+            </div>
+
+            <div class="modal-footer border-danger">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button type="button" class="btn btn-success" onclick="confirmarCompraConTarjeta()">
+                    Confirmar compra
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <script>
 const productos = <?php echo json_encode($productos, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-
+const clienteLogueado = <?= $cliente_logueado ? 'true' : 'false' ?>;
 const container = document.getElementById("productosContainer");
 const buscador = document.getElementById("buscador");
 
@@ -484,6 +553,43 @@ function finalizarCompra() {
         return;
     }
 
+    if (!clienteLogueado) {
+        alert("Para finalizar la compra tenés que iniciar sesión.");
+        window.location.href = "login.php";
+        return;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById("modalTarjeta"));
+    modal.show();
+}
+
+function confirmarCompraConTarjeta() {
+
+    const titular = document.getElementById("titularTarjeta").value.trim();
+    const numero = document.getElementById("numeroTarjeta").value.trim();
+    const vencimiento = document.getElementById("vencimientoTarjeta").value.trim();
+    const cvv = document.getElementById("cvvTarjeta").value.trim();
+
+    if (titular === "" || numero === "" || vencimiento === "" || cvv === "") {
+        alert("Completá todos los datos de la tarjeta.");
+        return;
+    }
+
+    if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$/.test(titular)) {
+        alert("El titular solo puede contener letras.");
+        return;
+    }
+
+    if (!/^[0-9]{16}$/.test(numero)) {
+        alert("El número de tarjeta debe tener 16 números.");
+        return;
+    }
+
+    if (!/^[0-9]{3,4}$/.test(cvv)) {
+        alert("El CVV debe tener 3 o 4 números.");
+        return;
+    }
+
     const items = carrito.map(item => ({
         id: item.id,
         nombre: item.nombre,
@@ -496,7 +602,14 @@ function finalizarCompra() {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ items: items })
+        body: JSON.stringify({ 
+            items: items,
+            pago: {
+                metodo: "Tarjeta",
+                titular: titular,
+                ultimos_digitos: numero.slice(-4)
+            }
+        })
     })
     .then(r => r.text())
     .then(d => {

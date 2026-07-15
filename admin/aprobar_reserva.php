@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include(__DIR__ . "/../php/conexion.php");
+date_default_timezone_set("America/Argentina/Buenos_Aires");
 
 /* PROTEGER SOLO ADMIN */
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
@@ -37,6 +38,31 @@ if (!$resReserva || mysqli_num_rows($resReserva) == 0) {
 }
 
 $reserva = mysqli_fetch_assoc($resReserva);
+/* VALIDAR QUE LA RESERVA ESTÉ PENDIENTE */
+if ($reserva['estado_reserva'] != 'Pendiente') {
+    echo "<script>
+        alert('Solo se pueden aprobar reservas pendientes.');
+        window.location='reservas.php';
+    </script>";
+    exit();
+}
+
+/* NO APROBAR RESERVAS DE FECHA U HORARIO PASADO */
+if ($reserva['fecha'] < date("Y-m-d")) {
+    echo "<script>
+        alert('No se puede aprobar una reserva con fecha pasada.');
+        window.location='reservas.php';
+    </script>";
+    exit();
+}
+
+if ($reserva['fecha'] == date("Y-m-d") && $reserva['hora_inicio'] <= date("H:i")) {
+    echo "<script>
+        alert('No se puede aprobar una reserva con horario pasado.');
+        window.location='reservas.php';
+    </script>";
+    exit();
+}
 
 /* VERIFICAR SOLAPAMIENTO CON OTRA RESERVA ACTIVA */
 $sqlCheck = "SELECT id_reserva 
@@ -73,10 +99,10 @@ if ($resCheck && mysqli_num_rows($resCheck) > 0) {
 }
 
 /* APROBAR RESERVA */
-$sqlUpdate = "UPDATE reservas 
+$sqlUpdate = $sqlUpdate = "UPDATE reservas 
               SET estado_reserva = 'Activa'
-              WHERE id_reserva = ?";
-
+              WHERE id_reserva = ?
+              AND estado_reserva = 'Pendiente'";
 $stmtUpdate = mysqli_prepare($conexion, $sqlUpdate);
 mysqli_stmt_bind_param($stmtUpdate, "i", $id_reserva);
 

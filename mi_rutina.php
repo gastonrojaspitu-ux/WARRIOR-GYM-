@@ -21,7 +21,7 @@ function limpiar($texto) {
 }
 
 function formatoFecha($fecha) {
-    if (empty($fecha)) {
+    if (empty($fecha) || $fecha == "0000-00-00") {
         return "Sin fecha";
     }
 
@@ -65,29 +65,22 @@ $columnasRutinaAsignada = obtenerColumnas($conexion, "rutina_asignada");
 
 $tieneEstado = columnaExiste($columnasRutinaAsignada, "estado");
 $tieneFecha = columnaExiste($columnasRutinaAsignada, "fecha_asignacion");
+$tienePersonal = columnaExiste($columnasRutinaAsignada, "id_personal");
 $pkRutinaAsignada = obtenerPrimaryKey($columnasRutinaAsignada);
-
-/*
-    CONSULTA:
-    - Si existe columna estado, busca solo Activa.
-    - Si existe fecha_asignacion, ordena por la más nueva.
-    - Si existe clave primaria, también ordena por ID descendente.
-    - Muestra solo una rutina.
-*/
 
 $whereEstado = "";
 $orderBy = [];
 
 if ($tieneEstado) {
-    $whereEstado = " AND LOWER(TRIM(estado)) = 'activa' ";
+    $whereEstado = " AND LOWER(TRIM(ra.estado)) = 'activa' ";
 }
 
 if ($tieneFecha) {
-    $orderBy[] = "fecha_asignacion DESC";
+    $orderBy[] = "ra.fecha_asignacion DESC";
 }
 
 if (!empty($pkRutinaAsignada)) {
-    $orderBy[] = "`$pkRutinaAsignada` DESC";
+    $orderBy[] = "ra.`$pkRutinaAsignada` DESC";
 }
 
 $orderSql = "";
@@ -96,12 +89,33 @@ if (count($orderBy) > 0) {
     $orderSql = " ORDER BY " . implode(", ", $orderBy);
 }
 
-$sql = "SELECT * 
-        FROM rutina_asignada 
-        WHERE id_cliente = ?
-        $whereEstado
-        $orderSql
-        LIMIT 1";
+/* CONSULTA DE RUTINA + ENTRENADOR */
+if ($tienePersonal) {
+
+    $sql = "SELECT 
+                ra.*,
+                p.nombre AS entrenador_nombre,
+                p.apellido AS entrenador_apellido
+            FROM rutina_asignada ra
+            LEFT JOIN personal p 
+                ON ra.id_personal = p.id_personal
+            WHERE ra.id_cliente = ?
+            $whereEstado
+            $orderSql
+            LIMIT 1";
+
+} else {
+
+    $sql = "SELECT 
+                ra.*,
+                NULL AS entrenador_nombre,
+                NULL AS entrenador_apellido
+            FROM rutina_asignada ra
+            WHERE ra.id_cliente = ?
+            $whereEstado
+            $orderSql
+            LIMIT 1";
+}
 
 $stmt = mysqli_prepare($conexion, $sql);
 
@@ -278,6 +292,20 @@ body {
                 </div>
 
             <?php endif; ?>
+
+            <div class="seccion">
+                <strong>👨‍🏫 Entrenador:</strong>
+
+                <?php if (!empty($rutina['entrenador_nombre']) || !empty($rutina['entrenador_apellido'])): ?>
+
+                    <?= limpiar(trim(($rutina['entrenador_apellido'] ?? '') . " " . ($rutina['entrenador_nombre'] ?? ''))) ?>
+
+                <?php else: ?>
+
+                    No asignado
+
+                <?php endif; ?>
+            </div>
 
             <div class="seccion">
                 <strong>📌 Descripción:</strong><br>

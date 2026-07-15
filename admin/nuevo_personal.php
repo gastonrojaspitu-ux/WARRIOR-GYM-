@@ -44,8 +44,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
 
         /* VALIDAR DOCUMENTO REPETIDO */
-        $sqlDoc = "SELECT id_personal FROM personal WHERE numero_documento = '$numero_documento' LIMIT 1";
-        $resDoc = mysqli_query($conexion, $sqlDoc);
+       $sqlDoc = "SELECT id_personal 
+           FROM personal 
+           WHERE id_tipo_documento = ? 
+           AND numero_documento = ? 
+           LIMIT 1";
+
+$stmtDoc = mysqli_prepare($conexion, $sqlDoc);
+mysqli_stmt_bind_param($stmtDoc, "is", $id_tipo_documento, $numero_documento);
+mysqli_stmt_execute($stmtDoc);
+$resDoc = mysqli_stmt_get_result($stmtDoc);
 
         if ($resDoc && mysqli_num_rows($resDoc) > 0) {
 
@@ -172,7 +180,7 @@ body {
 <body>
 
 <div class="header">
-    <h1>➕ Nuevo Personal</h1>
+    <h1>➕ Nuevo Entrenador / Personal</h1>
 </div>
 
 <div class="container">
@@ -198,9 +206,9 @@ body {
                 <option value="">Seleccionar tipo</option>
 
                 <?php while($td = mysqli_fetch_assoc($tipos_documento)): ?>
-                    <option value="<?= $td['id_tipo_documento'] ?>">
+                    <option value="<?= $td['id_tipo_documento'] ?>" <?= (isset($_POST['id_tipo_documento']) && $_POST['id_tipo_documento'] == $td['id_tipo_documento']) ? "selected" : "" ?>>
                         <?= htmlspecialchars($td['descripcion']) ?>
-                    </option>
+               </option>
                 <?php endwhile; ?>
             </select>
 
@@ -227,12 +235,12 @@ body {
 
             <label class="mb-1">Estado</label>
             <select name="estado" class="form-select mb-3" required>
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
+                <option value="Activo" <?= (($_POST['estado'] ?? 'Activo') == 'Activo') ? "selected" : "" ?>>Activo</option>
+                <option value="Inactivo" <?= (($_POST['estado'] ?? '') == 'Inactivo') ? "selected" : "" ?>>Inactivo</option>
             </select>
 
             <button type="submit" class="btn btn-warrior w-100">
-                Guardar Personal
+               Guardar Entrenador / Personal
             </button>
 
         </form>

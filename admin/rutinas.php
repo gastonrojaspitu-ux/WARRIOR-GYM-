@@ -10,6 +10,22 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['rol']) || $_SESSION['ro
 
 $mensaje = "";
 $error = "";
+$id_personal = 0;
+
+/* TRAER PERSONAL / ENTRENADORES */
+$entrenadores = [];
+
+$sqlEntrenadores = "SELECT id_personal, nombre, apellido
+                    FROM personal
+                    ORDER BY apellido, nombre";
+
+$resEntrenadores = mysqli_query($conexion, $sqlEntrenadores);
+
+if ($resEntrenadores) {
+    while ($e = mysqli_fetch_assoc($resEntrenadores)) {
+        $entrenadores[] = $e;
+    }
+}
 
 /* FUNCIONES */
 function limpiar($texto) {
@@ -26,28 +42,58 @@ function formatoFecha($fecha) {
 /* CREAR RUTINA */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['accion'] == "crear_rutina") {
 
+    $id_personal = intval($_POST['id_personal'] ?? 0);
     $nombre_rutina = trim($_POST['nombre_rutina'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
 
-    if ($nombre_rutina == "" || $descripcion == "") {
+    if ($id_personal <= 0 || $nombre_rutina == "" || $descripcion == "") {
 
-        $error = "Completá el nombre y la descripción de la rutina.";
+        $error = "Seleccioná un entrenador y completá el nombre y la descripción de la rutina.";
 
     } else {
 
-        $sql = "INSERT INTO rutinas (nombre_rutina, descripcion) VALUES (?, ?)";
-        $stmt = mysqli_prepare($conexion, $sql);
+        /* VALIDAR QUE EL ENTRENADOR EXISTA */
+        $sqlPersonal = "SELECT id_personal 
+                        FROM personal 
+                        WHERE id_personal = ?
+                        LIMIT 1";
 
-        if (!$stmt) {
-            $error = "Error al preparar la rutina: " . mysqli_error($conexion);
+        $stmtPersonal = mysqli_prepare($conexion, $sqlPersonal);
+
+        if (!$stmtPersonal) {
+
+            $error = "Error al preparar entrenador: " . mysqli_error($conexion);
+
         } else {
 
-            mysqli_stmt_bind_param($stmt, "ss", $nombre_rutina, $descripcion);
+            mysqli_stmt_bind_param($stmtPersonal, "i", $id_personal);
+            mysqli_stmt_execute($stmtPersonal);
+            $resPersonal = mysqli_stmt_get_result($stmtPersonal);
 
-            if (mysqli_stmt_execute($stmt)) {
-                $mensaje = "Rutina creada correctamente.";
+            if (!$resPersonal || mysqli_num_rows($resPersonal) == 0) {
+
+                $error = "El entrenador seleccionado no existe.";
+
             } else {
-                $error = "Error al crear rutina: " . mysqli_error($conexion);
+
+                $sql =$sql = "INSERT INTO rutinas (id_personal, nombre_rutina, descripcion, fecha_creacion) 
+        VALUES (?, ?, ?, CURDATE())";
+                $stmt = mysqli_prepare($conexion, $sql);
+
+                if (!$stmt) {
+
+                    $error = "Error al preparar la rutina: " . mysqli_error($conexion);
+
+                } else {
+
+                    mysqli_stmt_bind_param($stmt, "iss", $id_personal, $nombre_rutina, $descripcion);
+
+                    if (mysqli_stmt_execute($stmt)) {
+                        $mensaje = "Rutina creada correctamente.";
+                    } else {
+                        $error = "Error al crear rutina: " . mysqli_error($conexion);
+                    }
+                }
             }
         }
     }
@@ -67,10 +113,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['a
     } else {
 
         /* BUSCAR LA RUTINA EN LA TABLA rutinas */
-        $sqlRutina = "SELECT id_rutina, nombre_rutina, descripcion 
-                      FROM rutinas 
-                      WHERE id_rutina = ?
-                      LIMIT 1";
+        $sqlRutina = $sqlRutina = "SELECT id_rutina, id_personal, nombre_rutina, descripcion 
+              FROM rutinas 
+              WHERE id_rutina = ?
+              LIMIT 1";
 
         $stmtRutina = mysqli_prepare($conexion, $sqlRutina);
 
@@ -94,6 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['a
 
                 $nombre_rutina = $rutina['nombre_rutina'];
                 $descripcion = $rutina['descripcion'];
+                $id_personal = intval($rutina['id_personal']);
 
                 /*
                     DESACTIVAR RUTINAS ANTERIORES DEL CLIENTE
@@ -118,11 +165,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['a
                     Por eso solo guardamos:
                     id_cliente, nombre_rutina, descripcion, fecha_asignacion, estado
                 */
-                $sqlAsignar = "INSERT INTO rutina_asignada
-                               (id_cliente, nombre_rutina, descripcion, fecha_asignacion, estado)
-                               VALUES
-                               (?, ?, ?, CURDATE(), 'Activa')";
-
+                $sqlAsignar = $sqlAsignar = "INSERT INTO rutina_asignada
+               (id_cliente, id_personal, nombre_rutina, descripcion, fecha_asignacion, estado)
+               VALUES
+               (?, ?, ?, ?, CURDATE(), 'Activa')";
                 $stmtAsignar = mysqli_prepare($conexion, $sqlAsignar);
 
                 if (!$stmtAsignar) {
@@ -131,13 +177,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['a
 
                 } else {
 
-                    mysqli_stmt_bind_param(
-                        $stmtAsignar,
-                        "iss",
-                        $id_cliente,
-                        $nombre_rutina,
-                        $descripcion
-                    );
+                   mysqli_stmt_bind_param(
+    $stmtAsignar,
+    "iiss",
+    $id_cliente,
+    $id_personal,
+    $nombre_rutina,
+    $descripcion
+);
 
                     if (mysqli_stmt_execute($stmtAsignar)) {
 
@@ -382,6 +429,17 @@ body {
                 <form method="POST">
 
                     <input type="hidden" name="accion" value="crear_rutina">
+                    <label class="mb-1">Entrenador / Personal responsable</label>
+<select name="id_personal" class="form-select mb-3" required>
+    <option value="">Seleccionar entrenador</option>
+
+    <?php foreach ($entrenadores as $e): ?>
+        <option value="<?= intval($e['id_personal']) ?>" <?= ($id_personal == $e['id_personal']) ? "selected" : "" ?>>
+            <?= limpiar($e['apellido'] . " " . $e['nombre']) ?>
+        </option>
+    <?php endforeach; ?>
+
+</select>
 
                     <label class="mb-1">Nombre de rutina</label>
                     <input 
